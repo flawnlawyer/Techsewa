@@ -1,0 +1,73 @@
+# Techsewa - Setup Guide (Command Prompt)
+
+## Requirements
+
+- Python 3.8 or above installed  
+  Check with:
+python --version
+
+yaml
+Copy
+Edit
+
+- Microphone and speakers connected
+
+---
+
+## How to Install Required Python Packages
+
+1. Open **Command Prompt** (Press `Win + R`, type `cmd`, hit Enter)
+
+2. Run the following commands one by one:
+
+pip install vosk
+pip install sounddevice
+pip install pyttsx3
+pip install openai==0.28.1
+pip install pygame
+pip install fuzzywuzzy python-Levenshtein
+
+yaml
+Copy
+Edit
+
+---
+
+## How to Run Techsewa
+
+1. Navigate to your Techsewa folder in Command Prompt:
+
+F:
+cd Techsewa
+
+css
+Copy
+Edit
+
+2. Run the main app:
+
+python main.py
+
+yaml
+Copy
+Edit
+
+---
+
+## Notes
+
+- Make sure Vosk models are properly extracted inside `F:\Techsewa\Model\`  
+- Add your OpenAI API key inside `main.py` before running  
+- If you face any errors with `openai` library, ensure you have installed version `0.28.1`
+
+---
+
+## Contact
+
+For help, visit Learning Mission and Training Center, Thuphandanda, Dadeldhura  
+Phone: 9867315931  
+Email: learnermission@gmail.com  
+
+---
+
+*Created by Ayush Ojha*

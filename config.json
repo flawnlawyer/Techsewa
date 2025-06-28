@@ -1,0 +1,5 @@
+{
+  "max_listen_seconds": 10,
+  "min_confidence": 75,
+  "enable_easter_eggs": true
+}

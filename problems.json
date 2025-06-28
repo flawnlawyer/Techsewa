@@ -1,0 +1,354 @@
+[
+  {
+    "aliases": [
+      "wifi not working",
+      "wifi समस्या इन्टरनेट वाईफाई काम गर्दैन"
+    ],
+    "en": "Try restarting your router and check if the WiFi indicator light is on. If it still doesn't work, please visit our service center at Learning Mission and Training Center, Thuphandanda, Dadeldhura. Phone: 9867315931.",
+    "np": "राउटर फेरि सुरु गर्नुहोस् र WiFi बत्ती जलेको छ कि छैन हेर्नुहोस्। यदि समस्या जारी छ भने कृपया Learning Mission and Training Center, थुपनडाँडा, डडेलधुरा मा सम्पर्क गर्नुहोस्। फोन: ९८६७३१५९३१।"
+  },
+  {
+    "aliases": [
+      "slow internet",
+      "इन्टरनेट धीमे स्लो"
+    ],
+    "en": "Check if other devices are also slow. Try restarting your router. If slow speed persists, visiting our service center is recommended.",
+    "np": "अन्य उपकरणहरू पनि स्लो छन् कि छैनन् हेर्नुहोस्। राउटर फेरि सुरु गर्नुस्। समस्या रहेमा सेवा केन्द्रमा जानुहोस्।"
+  },
+  {
+    "aliases": [
+      "monitor black screen",
+      "स्क्रिन मोनिटर कालो छ मोनिटर काम गर्दैन"
+    ],
+    "en": "Check if the monitor cable is properly connected. Try a different cable or monitor. For further assistance, visit our service center.",
+    "np": "मोनिटरको केबल सही जडान भएको छ कि छैन जाँच गर्नुहोस्। अर्को केबल वा मोनिटर प्रयास गर्नुहोस्। थप सहयोगका लागि सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "printer not printing",
+      "प्रिन्टर प्रिन्टर समस्या"
+    ],
+    "en": "Ensure the printer has paper and ink. Restart the printer and your computer. If the issue remains, please visit our center.",
+    "np": "प्रिन्टरमा कागज र इंक छ कि छैन जाँच गर्नुहोस्। प्रिन्टर र कम्प्युटर पुनः सुरु गर्नुहोस्। समस्या रहेमा सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "keyboard not working",
+      "किबोर्ड किबोर्ड समस्या"
+    ],
+    "en": "Try connecting the keyboard to another USB port. Check if batteries need replacement (for wireless). If problems persist, visit us.",
+    "np": "किबोर्ड अर्को USB पोर्टमा जडान गरेर हेर्नुहोस्। वायरलेस भए ब्याट्री परिवर्तन गर्नुहोस्। समस्या जारी रहेमा सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "computer won't start",
+      "कम्प्युटर कम्प्युटर सुरु गर्दैन"
+    ],
+    "en": "Check if the power cable is plugged in and the power outlet works. For safety and detailed help, please visit our center.",
+    "np": "पावर केबल जडान भएको छ कि छैन र पावर आउटलेट काम गर्छ कि गर्दैन हेर्नुहोस्। थप सहयोगका लागि सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "blue screen error",
+      "त्रुटि ब्लु स्क्रिन"
+    ],
+    "en": "This might be a serious system error. Please back up your data and visit our service center for repair.",
+    "np": "यो गम्भीर सिस्टम त्रुटि हुन सक्छ। कृपया डेटा ब्याकअप गरी सेवा केन्द्रमा जानुहोस्।"
+  },
+  {
+    "aliases": [
+      "sound not working",
+      "समस्या आवाज आवाज आउँदैन"
+    ],
+    "en": "Check volume settings and audio device connections. Restart your computer. If no sound, visit our center.",
+    "np": "भोल्युम सेटिङ र अडियो उपकरण जडान जाँच गर्नुहोस्। कम्प्युटर पुनः सुरु गर्नुहोस्। समस्या जारी भए सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "software installation failed",
+      "सफ्टवेयर समस्या स्थापना असफल"
+    ],
+    "en": "Ensure you have proper permissions and enough disk space. For detailed help, please visit our service center.",
+    "np": "तपाईंलाई अनुमति छ कि छैन र डिस्क स्पेस छ कि छैन जाँच गर्नुहोस्। थप सहयोगका लागि सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "mobile charging problem",
+      "मोबाइल चार्जिंग समस्या चार्ज नहुने"
+    ],
+    "en": "Check your charger and cable with another device. If charging fails, visit our center for assistance.",
+    "np": "चार्जर र केबल अर्को उपकरणमा परीक्षण गर्नुहोस्। चार्ज नभएमा सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "laptop overheating",
+      "ल्यापटप धेरै तातो"
+    ],
+    "en": "Ensure the laptop is on a hard surface for ventilation. Clean air vents if dusty. Persistent heat issues require a visit to our center.",
+    "np": "लैपटप राम्रो हावाको लागि कडा सतहमा राख्नुहोस्। धूलो भए सफा गर्नुहोस्। समस्या जारी भए सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "camera not working",
+      "क्यामेरा समस्या क्यामेरा काम गर्दैन"
+    ],
+    "en": "Check camera permissions and drivers. Restart the device. For further support, visit our service center.",
+    "np": "क्यामेरा अनुमति र ड्राइभर जाँच गर्नुहोस्। उपकरण पुनः सुरु गर्नुहोस्। थप सहयोगका लागि सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "battery draining fast",
+      "ब्याट्री छिटो खपत"
+    ],
+    "en": "Close unnecessary apps and reduce screen brightness. If battery drains fast still, please visit our center.",
+    "np": "अवश्यक नभएका एपहरू बन्द गर्नुहोस् र स्क्रिन चमक कम गर्नुहोस्। समस्या जारी रहेमा सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "touchscreen not responding",
+      "टचस्क्रीन काम गर्दैन"
+    ],
+    "en": "Clean the screen and restart device. If unresponsive, visit our service center.",
+    "np": "स्क्रिन सफा गरी उपकरण पुनः सुरु गर्नुहोस्। समस्या रहेमा सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "usb device not recognized",
+      "USB डिभाइस मान्यता छैन"
+    ],
+    "en": "Try reconnecting the device or use another USB port. If still unrecognized, visit our center.",
+    "np": "डिभाइस पुनः जडान गर्नुहोस् वा अर्को USB पोर्ट प्रयोग गर्नुहोस्। समस्या रहेमा सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "windows update failed",
+      "विन्डोज अपडेट असफल"
+    ],
+    "en": "Ensure you have enough disk space and stable internet. For help, please visit our service center.",
+    "np": "पर्याप्त डिस्क स्पेस र स्थिर इन्टरनेट छ कि छैन जाँच गर्नुहोस्। सहयोगका लागि सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "forgot password",
+      "पासवर्ड बिर्सियो"
+    ],
+    "en": "Use password recovery options or reset tools. If unable, please visit our service center.",
+    "np": "पासवर्ड रिकभर गर्ने विकल्प वा रिसेट टुल प्रयोग गर्नुहोस्। नसकेमा सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "screen flickering",
+      "स्क्रिन झिलिमिली"
+    ],
+    "en": "Check cable connections and update display drivers. Persistent flickering needs professional check at our center.",
+    "np": "केबल जडान र ड्राइभर अपडेट गर्नुहोस्। समस्या जारी रहेमा सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "no internet connection",
+      "इन्टरनेट जडान छैन"
+    ],
+    "en": "Restart your modem and router. Check cables. Visit our center if issue persists.",
+    "np": "मोडेम र राउटर पुनः सुरु गर्नुहोस्। केबल जाँच गर्नुहोस्। समस्या जारी रहेमा सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "software crashing",
+      "सफ्टवेयर क्र्यास"
+    ],
+    "en": "Try reinstalling the software. If crashes continue, please visit our service center.",
+    "np": "सफ्टवेयर पुनःइन्स्टल गर्नुहोस्। समस्या जारी रहेमा सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "keyboard stuck keys",
+      "किबोर्ड टाँसिएको कुञ्जी"
+    ],
+    "en": "Clean the keyboard carefully. Try another keyboard if possible. For repair, visit our center.",
+    "np": "किबोर्ड सफा गर्नुहोस्। सकिए अर्को किबोर्ड प्रयोग गर्नुहोस्। मर्मतका लागि सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "device not charging",
+      "उपकरण चार्ज हुँदैन"
+    ],
+    "en": "Check charger and cable. Try another power source. If no charge, visit our center.",
+    "np": "चार्जर र केबल जाँच गर्नुहोस्। अर्को पावर स्रोत प्रयास गर्नुहोस्। समस्या रहेमा सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "bluetooth not connecting",
+      "ब्लुटुथ जडान हुँदैन"
+    ],
+    "en": "Ensure Bluetooth is on and device is in pairing mode. Restart devices. For persistent issues, visit our center.",
+    "np": "ब्लुटुथ अन छ र उपकरण पेयरिङ मोडमा छ कि छैन जाँच गर्नुहोस्। उपकरण पुनः सुरु गर्नुहोस्। समस्या जारी रहेमा सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "slow computer",
+      "कम्प्युटर स्लो"
+    ],
+    "en": "Close unused applications and restart the computer. For further help, please visit our center.",
+    "np": "अप्रयोग भएको एप बन्द गरी कम्प्युटर पुनः सुरु गर्नुहोस्। थप सहयोगका लागि सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "file not opening",
+      "फाइल खोलिँदैन"
+    ],
+    "en": "Check if the file is corrupted or unsupported. Try opening with another application. Visit our center if issue persists.",
+    "np": "फाइल बिग्रिएको वा समर्थन नभएको छ कि छैन जाँच गर्नुहोस्। अर्को एप प्रयोग गरी खोल्नुहोस्। समस्या रहेमा सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "cannot print",
+      "प्रिन्ट गर्न सकिँदैन"
+    ],
+    "en": "Check printer status and connection. Restart printer and computer. Visit our center if problem continues.",
+    "np": "प्रिन्टर स्थिति र जडान जाँच गर्नुहोस्। प्रिन्टर र कम्प्युटर पुनः सुरु गर्नुहोस्। समस्या जारी रहेमा सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "camera blurry",
+      "क्यामेरा धुँधलो"
+    ],
+    "en": "Clean the camera lens. Restart the device. For persistent issues, visit our center.",
+    "np": "क्यामेरा लेन्स सफा गर्नुहोस्। उपकरण पुनः सुरु गर्नुहोस्। समस्या जारी रहेमा सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "apps crashing",
+      "एप क्र्यास"
+    ],
+    "en": "Update the app or reinstall it. For further help, visit our center.",
+    "np": "एप अपडेट वा पुनःइन्स्टल गर्नुहोस्। थप सहयोगका लागि सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "device overheating",
+      "उपकरण धेरै तातो"
+    ],
+    "en": "Ensure good ventilation and avoid using on soft surfaces. Visit our center for hardware checkup.",
+    "np": "राम्रा हावा आउन दिनुहोस् र नरम सतहमा नचलाउनुहोस्। हार्डवेयर जाँचका लागि सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "screen cracked",
+      "स्क्रिन फुटेको"
+    ],
+    "en": "Physical damage needs professional repair. Please visit our service center.",
+    "np": "शारीरिक क्षति भएकाले पेशेवर मर्मत आवश्यक छ। कृपया सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "device freezes",
+      "उपकरण अड्किन्छ"
+    ],
+    "en": "Restart the device. If freezing continues, visit our center for diagnosis.",
+    "np": "उपकरण पुनः सुरु गर्नुहोस्। समस्या जारी रहेमा सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "app not installing",
+      "एप इन्स्टल हुँदैन"
+    ],
+    "en": "Ensure enough storage and compatible device. For help, visit our center.",
+    "np": "पर्याप्त स्टोरेज र उपयुक्त उपकरण छ कि छैन जाँच गर्नुहोस्। सहयोगका लागि सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "phone screen not responding",
+      "फोन स्क्रिन काम गर्दैन"
+    ],
+    "en": "Restart the phone and clean the screen. Visit our center if still unresponsive.",
+    "np": "फोन पुनः सुरु गर्नुहोस् र स्क्रिन सफा गर्नुहोस्। समस्या जारी रहेमा सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "system slow after update",
+      "अपडेट पछि प्रणाली स्लो"
+    ],
+    "en": "Try restarting the device and clearing cache. For persistent issues, visit our center.",
+    "np": "उपकरण पुनः सुरु गरी क्यास क्लियर गर्नुहोस्। समस्या जारी रहेमा सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "internet disconnects frequently",
+      "इन्टरनेट बारम्बार जडान टुट्छ"
+    ],
+    "en": "Restart modem/router. Check cables. If problem persists, visit our center.",
+    "np": "मोडेम/राउटर पुनः सुरु गर्नुहोस्। केबल जाँच गर्नुहोस्। समस्या जारी रहेमा सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "device slow to boot",
+      "उपकरण स्लो सुरु हुन्छ"
+    ],
+    "en": "Remove unnecessary startup programs. For detailed check, visit our center.",
+    "np": "आवश्यक नभएका स्टार्टअप प्रोग्राम हटाउनुहोस्। जाँचका लागि सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "headphones not working",
+      "हेडफोन काम गर्दैन"
+    ],
+    "en": "Check headphone jack or Bluetooth connection. Visit our center if still no sound.",
+    "np": "हेडफोन ज्याक वा ब्लुटुथ जडान जाँच गर्नुहोस्। समस्या जारी रहेमा सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "screen color distorted",
+      "स्क्रिन रंग बिग्रिएको"
+    ],
+    "en": "Update display drivers and check cables. For persistent issues, visit our center.",
+    "np": "डिस्प्ले ड्राइभर अपडेट र केबल जाँच गर्नुहोस्। समस्या जारी रहेमा सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "device shuts down suddenly",
+      "उपकरण अचानक बन्द हुन्छ"
+    ],
+    "en": "This may be battery or hardware issue. Visit our service center for diagnosis.",
+    "np": "यो ब्याट्री वा हार्डवेयर समस्या हुन सक्छ। जाँचका लागि सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "app keeps freezing",
+      "एप बारम्बार अड्किन्छ"
+    ],
+    "en": "Try updating or reinstalling the app. For more help, visit our center.",
+    "np": "एप अपडेट वा पुनःइन्स्टल गर्नुहोस्। थप सहयोगका लागि सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "cannot connect to wifi",
+      "वाईफाई जडान हुँदैन"
+    ],
+    "en": "Check router settings and password. Restart devices. Visit our center if problem persists.",
+    "np": "राउटर सेटिङ र पासवर्ड जाँच गर्नुहोस्। उपकरण पुनः सुरु गर्नुहोस्। समस्या जारी रहेमा सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "device vibrates but no sound",
+      "उपकरण कम्पन गर्छ तर आवाज आउँदैन"
+    ],
+    "en": "Check volume settings and sound profiles. For further assistance, visit our center.",
+    "np": "भोल्युम सेटिङ र साउन्ड प्रोफाइल जाँच गर्नुहोस्। थप सहयोगका लागि सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "cannot send emails",
+      "इमेल पठाउन सकिँदैन"
+    ],
+    "en": "Check internet connection and email server settings. For help, visit our service center.",
+    "np": "इन्टरनेट जडान र इमेल सेटिङ जाँच गर्नुहोस्। सहयोगका लागि सेवा केन्द्रमा आउनुहोस्।"
+  },
+  {
+    "aliases": [
+      "device wifi disconnects frequently",
+      "वाईफाई बारम्बार जडान टुट्छ"
+    ],
+    "en": "Restart router and device. Check for interference. Visit our center if problem continues.",
+    "np": "राउटर र उपकरण पुनः सुरु गर्नुहोस्। बाधा छ कि छैन जाँच गर्नुहोस्। समस्या जारी रहेमा सेवा केन्द्रमा आउनुहोस्।"
+  }
+]
