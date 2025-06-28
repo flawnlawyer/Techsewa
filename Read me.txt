@@ -6,9 +6,6 @@
   Check with:
 python --version
 
-yaml
-Copy
-Edit
 
 - Microphone and speakers connected
 
@@ -23,13 +20,10 @@ Edit
 pip install vosk
 pip install sounddevice
 pip install pyttsx3
-pip install openai==0.28.1
+pip install openai==0.28.1(currently not necessary)
 pip install pygame
 pip install fuzzywuzzy python-Levenshtein
 
-yaml
-Copy
-Edit
 
 ---
 
@@ -40,33 +34,24 @@ Edit
 F:
 cd Techsewa
 
-css
-Copy
-Edit
+
 
 2. Run the main app:
 
 python main.py
 
-yaml
-Copy
-Edit
+
 
 ---
 
 ## Notes
-
+- Currently open ai api feature unavailable 
 - Make sure Vosk models are properly extracted inside `F:\Techsewa\Model\`  
 - Add your OpenAI API key inside `main.py` before running  
 - If you face any errors with `openai` library, ensure you have installed version `0.28.1`
 
 ---
-
-## Contact
-
-For help, visit Learning Mission and Training Center, Thuphandanda, Dadeldhura  
-Phone: 9867315931  
-Email: learnermission@gmail.com  
+  
 
 ---
 
