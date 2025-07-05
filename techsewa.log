@@ -1,0 +1,17 @@
+[2025-07-04T09:59:46.203619] ⛔ Critical error: SmartBrain.__init__() got an unexpected keyword argument 'min_confidence'
+Traceback (most recent call last):
+  File "d:\Projects\Techsewa\main.py", line 554, in <module>
+    assistant = Techsewa()
+  File "d:\Projects\Techsewa\main.py", line 370, in __init__
+    self.brain = SmartBrain(
+                 ~~~~~~~~~~^
+        Config.PROBLEM_DB,
+        ^^^^^^^^^^^^^^^^^^
+        Config.ENABLE_INTERNET_LOOKUP,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        min_confidence=Config.MIN_CONFIDENCE
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+TypeError: SmartBrain.__init__() got an unexpected keyword argument 'min_confidence'
+

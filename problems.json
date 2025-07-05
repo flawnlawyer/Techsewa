@@ -350,5 +350,41 @@
     ],
     "en": "Restart router and device. Check for interference. Visit our center if problem continues.",
     "np": "राउटर र उपकरण पुनः सुरु गर्नुहोस्। बाधा छ कि छैन जाँच गर्नुहोस्। समस्या जारी रहेमा सेवा केन्द्रमा आउनुहोस्।"
+  },
+
+  {
+    "id": "audio_issues",
+    "aliases": ["mic problem", "microphone not working", "no sound", "audio issue"],
+    "np_aliases": ["माइक समस्या", "आवाज आउँदैन", "ध्वनि समस्या"],
+    "en": "For microphone issues:\n1. Check physical connections\n2. Test with another microphone\n3. Update audio drivers\n4. Check sound settings",
+    "np": "माइक समस्याको लागि:\n१. फिजिकल जडान जाँच गर्नुहोस्\n२. अर्को माइकले परीक्षण गर्नुहोस्\n३. अडियो ड्राइभर अपडेट गर्नुहोस्\n४. साउन्ड सेटिङ जाँच गर्नुहोस्",
+    "auto_fix": true
+  },
+  {
+    "id": "game_performance",
+    "aliases": ["game lag", "slow gaming", "fps drop"],
+    "np_aliases": ["खेल ढिलो", "गेमिङ समस्या"],
+    "en": "For game lag:\n1. Lower graphics settings\n2. Close background apps\n3. Update graphics drivers\n4. Check for overheating",
+    "np": "खेल ढिलो भएमा:\n१. ग्राफिक्स सेटिङ घटाउनुहोस्\n२. पृष्ठभूमिका एपहरू बन्द गर्नुहोस्\n३. ग्राफिक्स ड्राइभर अपडेट गर्नुहोस्\n४. तातो हुदैछ कि जाँच गर्नुहोस्",
+    "auto_fix": false
+  },
+  {
+    "id": "display_issues",
+    "aliases": ["no display", "black screen", "monitor problem"],
+    "np_aliases": ["डिस्प्ले छैन", "कालो पर्दा", "मोनिटर समस्या"],
+    "en": "For display issues:\n1. Check power and cables\n2. Try another monitor\n3. Test with onboard graphics\n4. Check GPU seating",
+    "np": "डिस्प्ले समस्याको लागि:\n१. पावर र केबल जाँच गर्नुहोस्\n२. अर्को मोनिटरले परीक्षण गर्नुहोस्\n३. अनबोर्ड ग्राफिक्सले परीक्षण गर्नुहोस्\n४. GPU सिटिङ जाँच गर्नुहोस्",
+    "auto_fix": false
+  },
+  {
+    "id": "network_issues",
+    "aliases": ["no internet", "wifi not working", "network problem"],
+    "np_aliases": ["इन्टरनेट छैन", "वाईफाई काम गर्दैन", "नेटवर्क समस्या"],
+    "en": "For network issues:\n1. Restart router/modem\n2. Check cables and connections\n3. Update network drivers\n4. Reset network settings",
+    "np": "नेटवर्क समस्याको लागि:\n१. राउटर/मोडेम पुनः सुरु गर्नुहोस्\n२. केबल र जडान जाँच गर्नुहोस्\n३. नेटवर्क ड्राइभर अपडेट गर्नुहोस्\n४. नेटवर्क सेटिङ रिसेट गर्नुहोस्",
+    "auto_fix": true
   }
 ]
+  
+  
+  
