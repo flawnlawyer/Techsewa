@@ -1,7 +1,13 @@
 {
-  "max_listen_seconds": 10,
-  "min_confidence": 75,
+  "enable_internet": true,
   "enable_voice": true,
+  "min_confidence": 100,
+  "language": "np",
+  "voice_rate": 168,
+  "voice_volume": 90,
+  "theme": "dark",
+  "font_size": 12,
+  "max_listen_seconds": 10,
   "enable_diagnostics": true,
   "enable_internet_lookup": true
 }
