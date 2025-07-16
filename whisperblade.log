@@ -1,0 +1,12 @@
+2025-07-16 21:22:05,476 - INFO - Processing input: {'text': 'startup problem', 'lang': 'en'}
+2025-07-16 21:22:05,479 - INFO - CRM Log: {'timestamp': 1752680225.4799192, 'user_id': None, 'query': 'startup problem', 'response_source': 'local', 'success': True}
+2025-07-16 21:22:05,531 - INFO - Processing input: {'text': 'weather today', 'lang': 'en'}
+2025-07-16 21:22:05,575 - INFO - CRM Log: {'timestamp': 1752680225.5749729, 'user_id': None, 'query': 'weather today', 'response_source': 'wikipedia', 'success': True}
+2025-07-16 21:22:05,575 - INFO - Processing input: {'sensor_readings': True}
+2025-07-16 21:24:08,329 - INFO - Processing input: {'text': 'startup problem', 'lang': 'en'}
+2025-07-16 21:24:08,330 - INFO - CRM Log: {'timestamp': 1752680348.33051, 'user_id': None, 'query': 'startup problem', 'response_source': 'local', 'success': True}
+2025-07-16 21:24:08,386 - INFO - Processing input: {'text': 'इन्टरनेट छैन', 'lang': 'np'}
+2025-07-16 21:24:08,387 - INFO - CRM Log: {'timestamp': 1752680348.3871193, 'user_id': None, 'query': 'इन्टरनेट छैन', 'response_source': 'local', 'success': True}
+2025-07-16 21:24:08,387 - INFO - Processing input: {'text': 'weather today', 'lang': 'en'}
+2025-07-16 21:24:08,421 - INFO - CRM Log: {'timestamp': 1752680348.4213648, 'user_id': None, 'query': 'weather today', 'response_source': 'wikipedia', 'success': True}
+2025-07-16 21:24:08,422 - INFO - Processing input: {'sensor_readings': True}

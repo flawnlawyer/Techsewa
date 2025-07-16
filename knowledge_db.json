@@ -1,0 +1,31 @@
+[
+  {
+    "id": "startup_error",
+    "aliases": [
+      "slow boot",
+      "startup problem",
+      "boot issue"
+    ],
+    "np_aliases": [
+      "सुरु हुन्न",
+      "धिलो खुल्छ"
+    ],
+    "en": "Try these steps: 1) Check power connections 2) Run system diagnostics 3) Clear temporary files",
+    "np": "यी कदमहरू प्रयास गर्नुहोस्: १) पावर जडान जाँच गर्नुहोस् २) सिस्टम निदान चलाउनुहोस् ३) अस्थायी फाइलहरू सफा गर्नुहोस्",
+    "error_code": "0x800F0922"
+  },
+  {
+    "id": "internet_issue",
+    "aliases": [
+      "no internet",
+      "wifi not working",
+      "connection problem"
+    ],
+    "np_aliases": [
+      "इन्टरनेट छैन",
+      "वाइफाई काम गर्दैन"
+    ],
+    "en": "Internet troubleshooting: 1) Check router power 2) Restart network adapter 3) Run network troubleshooter",
+    "np": "इन्टरनेट समस्या निवारण: १) राउटर पावर जाँच गर्नुहोस् २) नेटवर्क एडाप्टर पुनः सुरु गर्नुहोस् ३) नेटवर्क समस्या निवारक चलाउनुहोस्"
+  }
+]
