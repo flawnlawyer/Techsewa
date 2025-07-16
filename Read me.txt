@@ -16,18 +16,20 @@ python --version
 1. Open **Command Prompt** (Press `Win + R`, type `cmd`, hit Enter)
 
 2. Run the following commands one by one:
-
-pip install vosk
-pip install sounddevice
-pip install pyttsx3
-pip install openai==0.28.1(currently not necessary)
-pip install pygame
-pip install fuzzywuzzy python-Levenshtein
-pip install psutil
-pip install requests beautiful <Brain Module>
-
-
-
+pip install tkinter  # Usually comes with Python
+pip install pillow  # PIL for image handling
+pip install pyttsx3  # Text-to-speech engine
+pip install requests  # HTTP requests for web search
+pip install psutil  # System monitoring
+pip install matplotlib  # Charts and graphs
+pip install sv-ttk  # Modern theme for Tkinter
+pip install ping3  # Network ping utility
+pip install fuzzywuzzy  # Fuzzy string matching pip install gTTS  # Google Text-to-Speech (for Nepali TTS)
+pip install playsound  # Audio playback
+pip install python-Levenshtein  # Improves fuzzywuzzy performance
+pip install pyinstaller  # For creating executables
+pip install autopep8  # Code formatting
+pip install pillow pyttsx3 requests psutil matplotlib sv-ttk ping3 fuzzywuzzy gTTS playsound python-Levenshtein
 ---
 
 ## How to Run Techsewa
@@ -41,17 +43,12 @@ cd Techsewa
 
 2. Run the main app:
 
-python main.py
+python ui.py
 
 
 
 ---
 
-## Notes
-- Currently open ai api feature unavailable 
-- Make sure Vosk models are properly extracted inside `F:\Techsewa\Model\`  
-- Add your OpenAI API key inside `main.py` before running  
-- If you face any errors with `openai` library, ensure you have installed version `0.28.1`
 
 ---
   
