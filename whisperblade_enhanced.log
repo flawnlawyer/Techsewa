@@ -4,3 +4,11 @@
 2025-07-17 12:08:28,045 - comtypes.client._code_cache - INFO - Imported existing <module 'comtypes.gen' from 'C:\\Users\\Ayush\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\comtypes\\gen\\__init__.py'>
 2025-07-17 12:08:28,046 - comtypes.client._code_cache - INFO - Using writeable comtypes cache directory: 'C:\Users\Ayush\AppData\Local\Programs\Python\Python313\Lib\site-packages\comtypes\gen'
 2025-07-17 12:08:28,554 - __main__ - INFO - All components initialized successfully
+2025-07-17 20:36:10,820 - __main__ - INFO - Initializing WhisperBlade Ultimate Enhanced...
+2025-07-17 20:36:10,830 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-07-17 20:36:10,830 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-17 20:36:16,780 - comtypes.client._code_cache - INFO - Imported existing <module 'comtypes.gen' from 'C:\\Users\\Ayush\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\comtypes\\gen\\__init__.py'>
+2025-07-17 20:36:16,781 - comtypes.client._code_cache - INFO - Using writeable comtypes cache directory: 'C:\Users\Ayush\AppData\Local\Programs\Python\Python313\Lib\site-packages\comtypes\gen'
+2025-07-17 20:36:17,217 - __main__ - INFO - All components initialized successfully
+2025-07-17 20:36:19,699 - root - ERROR - DuckDuckGo search error: 200, message='Attempt to decode JSON with unexpected mimetype: application/x-javascript', url='https://api.duckduckgo.com/?q=error+code+0x800F0922&format=json&no_html=1&skip_disambig=1'
+2025-07-17 20:36:25,317 - root - INFO - Web search successful using _search_fallback_scraping

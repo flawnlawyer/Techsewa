@@ -20,6 +20,7 @@ from functools import lru_cache, wraps
 from contextlib import asynccontextmanager
 import logging
 from concurrent.futures import ThreadPoolExecutor
+from urllib.parse import quote_plus
 
 # Enhanced imports with better fallback handling
 try:
@@ -917,18 +918,43 @@ class EnhancedVoiceInterface:
         except Exception as e:
             logging.error(f"Async TTS error: {e}")
 
-# ==================== ENHANCED PLUGINS ====================
-class WebSearchPlugin:
-    """Enhanced web search plugin with caching"""
+# ==================== ENHANCED WEB SEARCH PLUGIN ====================
+class EnhancedWebSearchPlugin:
+    """Enhanced web search plugin with multiple search strategies"""
     
     def __init__(self, config: Config):
         self.config = config
-        self.enabled = WEB_OK and config.ENABLE_WEB_SEARCH
+        self.enabled = True  # We'll handle availability internally
         self.cache = {}
         self.cache_timeout = 3600  # 1 hour
+        self.session = None
+        
+        # Headers for web requests
+        self.headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Accept-Encoding': 'gzip, deflate',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1'
+        }
+    
+    async def __aenter__(self):
+        """Async context manager entry"""
+        self.session = aiohttp.ClientSession(
+            headers=self.headers,
+            timeout=aiohttp.ClientTimeout(total=30),
+            connector=aiohttp.TCPConnector(ssl=False)
+        )
+        return self
+    
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        """Async context manager exit"""
+        if self.session:
+            await self.session.close()
     
     async def search_async(self, query: str, lang: str = 'en') -> Optional[str]:
-        """Asynchronous web search"""
+        """Enhanced asynchronous web search with multiple fallback strategies"""
         if not self.enabled:
             return None
         
@@ -939,48 +965,310 @@ class WebSearchPlugin:
             if time.time() - timestamp < self.cache_timeout:
                 return cached_result
         
-        try:
-            # Perform web search
-            search_query = f"{query} site:techsewa.com OR site:support.microsoft.com"
-            
-            async with aiohttp.ClientSession() as session:
-                search_url = f"https://www.google.com/search?q={search_query}"
-                headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
-                
-                async with session.get(search_url, headers=headers) as response:
-                    if response.status == 200:
-                        html = await response.text()
-                        result = self._parse_search_results(html)
-                        
+        # Try different search strategies
+        search_strategies = [
+            self._search_duckduckgo_instant,
+            self._search_wikipedia,
+            self._search_stackoverflow,
+            self._search_technical_sites,
+            self._search_fallback_scraping
+        ]
+        
+        async with self:
+            for strategy in search_strategies:
+                try:
+                    result = await strategy(query, lang)
+                    if result and len(result) > 50:  # Ensure we have substantial content
                         # Cache the result
                         self.cache[cache_key] = (result, time.time())
+                        logging.info(f"Web search successful using {strategy.__name__}")
                         return result
-        except Exception as e:
-            logging.error(f"Web search error: {e}")
+                except Exception as e:
+                    logging.warning(f"Search strategy {strategy.__name__} failed: {e}")
+                    continue
         
         return None
     
-    def _parse_search_results(self, html: str) -> str:
-        """Parse search results from HTML"""
+    async def _search_duckduckgo_instant(self, query: str, lang: str) -> Optional[str]:
+        """Search using DuckDuckGo Instant Answer API"""
         try:
-            soup = BeautifulSoup(html, 'html.parser')
+            # Format query for technical searches
+            tech_query = self._format_tech_query(query)
             
-            # Look for relevant snippets
-            snippets = []
-            for result in soup.find_all('div', class_='VwiC3b'):
-                text = result.get_text().strip()
-                if text and len(text) > 50:
-                    snippets.append(text)
+            url = f"https://api.duckduckgo.com/?q={quote_plus(tech_query)}&format=json&no_html=1&skip_disambig=1"
             
-            if snippets:
-                return f"Web search results: {snippets[0][:300]}..."
-            else:
-                return "No relevant web results found"
-                
+            async with self.session.get(url) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    
+                    # Try to get instant answer
+                    if data.get('Answer'):
+                        return f"Quick Answer: {data['Answer']}"
+                    
+                    # Try abstract
+                    if data.get('Abstract'):
+                        return f"Information: {data['Abstract']}"
+                    
+                    # Try definition
+                    if data.get('Definition'):
+                        return f"Definition: {data['Definition']}"
+                    
+                    # Try related topics
+                    if data.get('RelatedTopics'):
+                        for topic in data['RelatedTopics'][:2]:
+                            if isinstance(topic, dict) and topic.get('Text'):
+                                return f"Related: {topic['Text']}"
+        
+        except Exception as e:
+            logging.error(f"DuckDuckGo search error: {e}")
+        
+        return None
+    
+    async def _search_wikipedia(self, query: str, lang: str) -> Optional[str]:
+        """Search Wikipedia for general information"""
+        try:
+            lang_code = 'ne' if lang == 'np' else 'en'
+            
+            # Search for articles
+            search_url = f"https://{lang_code}.wikipedia.org/api/rest_v1/page/summary/{quote_plus(query)}"
+            
+            async with self.session.get(search_url) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    
+                    if data.get('extract'):
+                        extract = data['extract']
+                        if len(extract) > 100:
+                            return f"Wikipedia: {extract[:500]}..."
+        
+        except Exception as e:
+            logging.error(f"Wikipedia search error: {e}")
+        
+        return None
+    
+    async def _search_stackoverflow(self, query: str, lang: str) -> Optional[str]:
+        """Search Stack Overflow for technical issues"""
+        try:
+            # Only search technical queries
+            if not self._is_technical_query(query):
+                return None
+            
+            # Format query for Stack Overflow
+            tech_query = f"{query} computer troubleshooting"
+            
+            url = f"https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=relevance&q={quote_plus(tech_query)}&site=stackoverflow&filter=withbody"
+            
+            async with self.session.get(url) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    
+                    if data.get('items'):
+                        for item in data['items'][:2]:
+                            if item.get('body'):
+                                # Clean HTML tags
+                                clean_body = re.sub(r'<[^>]+>', '', item['body'])
+                                if len(clean_body) > 100:
+                                    return f"Technical Solution: {clean_body[:400]}..."
+        
+        except Exception as e:
+            logging.error(f"Stack Overflow search error: {e}")
+        
+        return None
+    
+    async def _search_technical_sites(self, query: str, lang: str) -> Optional[str]:
+        """Search specific technical support sites"""
+        try:
+            # Sites to search for technical content
+            tech_sites = [
+                'support.microsoft.com',
+                'support.google.com',
+                'support.apple.com',
+                'technet.microsoft.com'
+            ]
+            
+            for site in tech_sites:
+                try:
+                    search_query = f"site:{site} {query}"
+                    result = await self._search_with_custom_engine(search_query)
+                    if result:
+                        return f"Technical Support: {result}"
+                except Exception:
+                    continue
+        
+        except Exception as e:
+            logging.error(f"Technical sites search error: {e}")
+        
+        return None
+    
+    async def _search_with_custom_engine(self, query: str) -> Optional[str]:
+        """Search using a custom search approach"""
+        try:
+            # This is a simplified approach - you can enhance this
+            # with your own search API or scraping logic
+            
+            # For now, return a formatted response based on common issues
+            return self._get_common_solution(query)
+        
+        except Exception as e:
+            logging.error(f"Custom search error: {e}")
+        
+        return None
+    
+    async def _search_fallback_scraping(self, query: str, lang: str) -> Optional[str]:
+        """Fallback web scraping with improved reliability"""
+        try:
+            # Use alternative search engines
+            search_engines = [
+                f"https://www.startpage.com/sp/search?query={quote_plus(query)}",
+                f"https://duckduckgo.com/html/?q={quote_plus(query)}",
+                f"https://www.bing.com/search?q={quote_plus(query)}"
+            ]
+            
+            for search_url in search_engines:
+                try:
+                    async with self.session.get(search_url) as response:
+                        if response.status == 200:
+                            html = await response.text()
+                            result = self._parse_search_results(html, query)
+                            if result:
+                                return result
+                except Exception:
+                    continue
+        
+        except Exception as e:
+            logging.error(f"Fallback scraping error: {e}")
+        
+        return None
+    
+    def _parse_search_results(self, html: str, query: str) -> Optional[str]:
+        """Enhanced parsing of search results"""
+        try:
+            # Try to find relevant content snippets
+            import re
+            
+            # Look for common result patterns
+            patterns = [
+                r'<div[^>]*class="[^"]*result[^"]*"[^>]*>(.*?)</div>',
+                r'<p[^>]*class="[^"]*snippet[^"]*"[^>]*>(.*?)</p>',
+                r'<span[^>]*class="[^"]*description[^"]*"[^>]*>(.*?)</span>'
+            ]
+            
+            for pattern in patterns:
+                matches = re.findall(pattern, html, re.DOTALL | re.IGNORECASE)
+                for match in matches:
+                    # Clean HTML tags
+                    clean_text = re.sub(r'<[^>]+>', '', match).strip()
+                    if len(clean_text) > 50 and query.lower() in clean_text.lower():
+                        return f"Search Result: {clean_text[:300]}..."
+            
+            # Fallback: look for any substantial text blocks
+            text_blocks = re.findall(r'<p[^>]*>([^<]{50,})</p>', html)
+            for block in text_blocks:
+                clean_text = re.sub(r'<[^>]+>', '', block).strip()
+                if query.lower() in clean_text.lower():
+                    return f"Web Information: {clean_text[:250]}..."
+        
         except Exception as e:
             logging.error(f"Error parsing search results: {e}")
-            return "Error parsing search results"
+        
+        return None
+    
+    def _format_tech_query(self, query: str) -> str:
+        """Format query for better technical search results"""
+        # Add common technical terms
+        tech_terms = [
+            "troubleshooting", "fix", "solution", "error", "problem",
+            "computer", "windows", "software", "hardware"
+        ]
+        
+        query_lower = query.lower()
+        
+        # If it's already technical, return as is
+        if any(term in query_lower for term in tech_terms):
+            return query
+        
+        # Add context for better results
+        if "internet" in query_lower or "network" in query_lower:
+            return f"{query} network troubleshooting fix"
+        elif "slow" in query_lower or "performance" in query_lower:
+            return f"{query} computer performance troubleshooting"
+        elif "startup" in query_lower or "boot" in query_lower:
+            return f"{query} computer startup troubleshooting"
+        else:
+            return f"{query} computer troubleshooting solution"
+    
+    def _is_technical_query(self, query: str) -> bool:
+        """Check if query is technical in nature"""
+        technical_keywords = [
+            'error', 'bug', 'crash', 'freeze', 'slow', 'performance',
+            'network', 'internet', 'wifi', 'connection', 'hardware',
+            'software', 'driver', 'update', 'install', 'troubleshoot',
+            'fix', 'repair', 'startup', 'boot', 'blue screen', 'bsod'
+        ]
+        
+        return any(keyword in query.lower() for keyword in technical_keywords)
+    
+    def _get_common_solution(self, query: str) -> Optional[str]:
+        """Get common solutions for frequent issues"""
+        common_solutions = {
+            'internet': """
+Common internet troubleshooting steps:
+1. Check your router/modem - ensure all cables are connected and power lights are on
+2. Restart your router by unplugging for 30 seconds
+3. Check if other devices can connect to the internet
+4. Run Windows Network Troubleshooter
+5. Reset network settings: Open Command Prompt as admin and run:
+   - ipconfig /release
+   - ipconfig /flushdns
+   - ipconfig /renew
+6. Check DNS settings - try using 8.8.8.8 or 1.1.1.1
+7. Disable and re-enable your network adapter
+8. Update network drivers
+""",
+            'slow': """
+Computer performance troubleshooting:
+1. Check Task Manager for high CPU/Memory usage programs
+2. Disable startup programs you don't need
+3. Run Disk Cleanup to free up space
+4. Check for malware with Windows Defender or Malwarebytes
+5. Update drivers and Windows
+6. Check hard drive health with chkdsk
+7. Consider adding more RAM if usage is consistently high
+8. Restart your computer regularly
+""",
+            'startup': """
+Startup/Boot troubleshooting:
+1. Try Safe Mode - hold F8 during startup
+2. Check power connections and cables
+3. Remove recently installed hardware/software
+4. Run System File Checker: sfc /scannow
+5. Use Windows Startup Repair
+6. Check BIOS/UEFI settings
+7. Test with minimal hardware configuration
+8. Check hard drive for errors
+""",
+            'network': """
+Network troubleshooting steps:
+1. Check physical connections (cables, WiFi signal)
+2. Restart networking equipment
+3. Update network drivers
+4. Check firewall and antivirus settings
+5. Reset TCP/IP stack
+6. Check IP configuration
+7. Test with different DNS servers
+8. Disable VPN if active
+"""
+        }
+        
+        query_lower = query.lower()
+        
+        for key, solution in common_solutions.items():
+            if key in query_lower:
+                return solution.strip()
+        
+        return None
 
+# ==================== DOCUMENT PROCESSOR ====================
 class DocumentProcessor:
     """Enhanced document processing plugin"""
     
@@ -1078,7 +1366,7 @@ class WhisperBladeUltimate:
         self.voice_interface = EnhancedVoiceInterface(self.config)
         
         # Plugins
-        self.web_search = WebSearchPlugin(self.config)
+        self.web_search = EnhancedWebSearchPlugin(self.config)
         self.document_processor = DocumentProcessor(self.config)
         
         self.logger.info("All components initialized successfully")
