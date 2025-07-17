@@ -1,0 +1,119 @@
+{
+  "hostname": "DESKTOP-2P502M6",
+  "os_name": "Windows",
+  "os_version": "11",
+  "architecture": "64bit",
+  "boot_time": 1752137678.4866738,
+  "uptime_seconds": 594766.6660556793,
+  "cpu": {
+    "name": "AMD Ryzen 5 8640HS w/ Radeon 760M Graphics",
+    "brand": "AMD64 Family 25 Model 117 Stepping 2, AuthenticAMD",
+    "architecture": "64bit",
+    "physical_cores": 6,
+    "logical_cores": 12,
+    "base_frequency": 2486.0,
+    "max_frequency": 3501.0,
+    "cache_size": null,
+    "features": [
+      "Description=AMD64 Family 25 Model 117 Stepping 2"
+    ]
+  },
+  "memory_total_gb": 15.31,
+  "memory_available_gb": 5.66,
+  "disks": [
+    {
+      "device": "C:\\",
+      "mountpoint": "C:\\",
+      "filesystem": "NTFS",
+      "total_gb": 172.06,
+      "used_gb": 65.15,
+      "free_gb": 106.92,
+      "usage_percent": 37.9,
+      "disk_type": "Unknown",
+      "serial_number": null
+    },
+    {
+      "device": "D:\\",
+      "mountpoint": "D:\\",
+      "filesystem": "NTFS",
+      "total_gb": 300.0,
+      "used_gb": 15.24,
+      "free_gb": 284.76,
+      "usage_percent": 5.1,
+      "disk_type": "Unknown",
+      "serial_number": null
+    },
+    {
+      "device": "E:\\",
+      "mountpoint": "E:\\",
+      "filesystem": "NTFS",
+      "total_gb": 3.86,
+      "used_gb": 2.76,
+      "free_gb": 1.1,
+      "usage_percent": 71.5,
+      "disk_type": "Unknown",
+      "serial_number": null
+    }
+  ],
+  "gpus": [
+    {
+      "name": "AMD Radeon 760M Graphics",
+      "vendor": "AMD",
+      "driver_version": "31.0.22038.4003",
+      "memory_total": 536870912,
+      "memory_used": null,
+      "temperature": null
+    }
+  ],
+  "network_interfaces": [
+    {
+      "name": "Loopback Pseudo-Interface 1",
+      "display_name": "Loopback Pseudo-Interface 1",
+      "mac_address": "Unknown",
+      "ip_addresses": [
+        "127.0.0.1"
+      ],
+      "is_up": true,
+      "speed": 1073,
+      "duplex": "NIC_DUPLEX_FULL"
+    },
+    {
+      "name": "Wi-Fi",
+      "display_name": "Wi-Fi",
+      "mac_address": "2C-9C-58-20-59-D7",
+      "ip_addresses": [
+        "192.168.1.73"
+      ],
+      "is_up": true,
+      "speed": 144,
+      "duplex": "NIC_DUPLEX_FULL"
+    },
+    {
+      "name": "Local Area Connection* 1",
+      "display_name": "Local Area Connection* 1",
+      "mac_address": "2E-9C-58-20-79-F7",
+      "ip_addresses": [
+        "169.254.125.64"
+      ],
+      "is_up": false,
+      "speed": null,
+      "duplex": "NIC_DUPLEX_FULL"
+    },
+    {
+      "name": "Local Area Connection* 2",
+      "display_name": "Local Area Connection* 2",
+      "mac_address": "2E-9C-58-20-69-E7",
+      "ip_addresses": [
+        "169.254.107.86"
+      ],
+      "is_up": false,
+      "speed": null,
+      "duplex": "NIC_DUPLEX_FULL"
+    }
+  ],
+  "printers": [
+    "OneNote (Desktop)",
+    "Microsoft Print to PDF"
+  ],
+  "usb_devices": []
+}

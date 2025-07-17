@@ -1,0 +1,8 @@
+{
+  "max_cpu_processes_to_kill": 3,
+  "cpu_threshold_for_termination": 50,
+  "memory_cleanup_aggressive": false,
+  "auto_restart_services": true,
+  "backup_before_changes": true,
+  "notification_enabled": true
+}

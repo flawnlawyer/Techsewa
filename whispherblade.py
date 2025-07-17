@@ -1,457 +1,1297 @@
 #!/usr/bin/env python3
-# whisperblade_ultimate.py - The All-in-One AI Brain for TechSewa
+"""
+WhisperBlade Ultimate Enhanced - Advanced AI Support System for TechSewa
+Version 2.0 - Improved architecture, performance, and features
+"""
+
 import os
 import json
 import re
 import time
 import hashlib
-import requests
-import psutil
-from bs4 import BeautifulSoup
-from fuzzywuzzy import fuzz
-from functools import lru_cache
-from typing import Dict, List, Optional, Tuple
+import asyncio
+import aiohttp
+import sqlite3
+from pathlib import Path
+from datetime import datetime, timedelta
+from dataclasses import dataclass, asdict
+from typing import Dict, List, Optional, Tuple, Any, Union
+from functools import lru_cache, wraps
+from contextlib import asynccontextmanager
 import logging
+from concurrent.futures import ThreadPoolExecutor
 
-# Optional imports with fallback handling
+# Enhanced imports with better fallback handling
+try:
+    import psutil
+    HW_MONITOR_OK = True
+except ImportError:
+    HW_MONITOR_OK = False
+    print("⚠️  psutil not available - hardware monitoring disabled")
+
 try:
     from sentence_transformers import SentenceTransformer, util
-    _SEMANTIC_OK = True
+    import torch
+    SEMANTIC_OK = True
 except ImportError:
-    _SEMANTIC_OK = False
-    print("Warning: sentence_transformers not available. Semantic search disabled.")
-
-try:
-    import PyPDF2
-    _PDF_OK = True
-except ImportError:
-    _PDF_OK = False
-    print("Warning: PyPDF2 not available. PDF processing disabled.")
+    SEMANTIC_OK = False
+    print("⚠️  sentence_transformers not available - semantic search disabled")
 
 try:
     import speech_recognition as sr
-    _SPEECH_OK = True
+    import pyttsx3
+    SPEECH_OK = True
 except ImportError:
-    _SPEECH_OK = False
-    print("Warning: speech_recognition not available. Voice interface disabled.")
+    SPEECH_OK = False
+    print("⚠️  speech libraries not available - voice interface disabled")
 
-# ==================== CONSTANTS ====================
-KNOWLEDGE_DB = "knowledge_db.json"
-SUPPORT_INFO = """
-📌 Need more help? Contact:
-📍 Learner Mission & Training Center
-🗺️ Thuphandanda, Dadeldhura
-📞 9867315931 | 📧 learnermission@gmail.com
+try:
+    import PyPDF2
+    import docx
+    DOCUMENT_OK = True
+except ImportError:
+    DOCUMENT_OK = False
+    print("⚠️  document libraries not available - PDF/Word processing disabled")
+
+try:
+    import requests
+    from bs4 import BeautifulSoup
+    WEB_OK = True
+except ImportError:
+    WEB_OK = False
+    print("⚠️  web libraries not available - web search disabled")
+
+try:
+    from fuzzywuzzy import fuzz, process
+    FUZZY_OK = True
+except ImportError:
+    FUZZY_OK = False
+    print("⚠️  fuzzywuzzy not available - fuzzy matching disabled")
+
+# ==================== CONFIGURATION ====================
+@dataclass
+class Config:
+    """Configuration settings"""
+    DB_PATH: str = "whisperblade.db"
+    CACHE_SIZE: int = 5000
+    MAX_RESPONSE_TIME: float = 3.0
+    SEMANTIC_THRESHOLD: float = 0.65
+    FUZZY_THRESHOLD: int = 70
+    LOG_LEVEL: str = "INFO"
+    ENABLE_VOICE: bool = True
+    ENABLE_HARDWARE_MONITORING: bool = True
+    ENABLE_WEB_SEARCH: bool = True
+    SUPPORT_CONTACT: str = """
+📌 TechSewa Support:
+🏢 Learner Mission & Training Center
+🗺️ Thuphandanda, Dadeldhura, Nepal
+📞 +977-9867315931
+📧 learnermission@gmail.com
+⏰ 24/7 Support Available
 """
 
-# Default knowledge base (was missing)
-DEFAULT_KNOWLEDGE = [
-    {
-        "id": "startup_error",
-        "aliases": ["slow boot", "startup problem", "boot issue"],
-        "np_aliases": ["सुरु हुन्न", "धिलो खुल्छ"],
-        "en": "Try these steps: 1) Check power connections 2) Run system diagnostics 3) Clear temporary files",
-        "np": "यी कदमहरू प्रयास गर्नुहोस्: १) पावर जडान जाँच गर्नुहोस् २) सिस्टम निदान चलाउनुहोस् ३) अस्थायी फाइलहरू सफा गर्नुहोस्",
-        "error_code": "0x800F0922"
-    },
-    {
-        "id": "internet_issue",
-        "aliases": ["no internet", "wifi not working", "connection problem"],
-        "np_aliases": ["इन्टरनेट छैन", "वाइफाई काम गर्दैन"],
-        "en": "Internet troubleshooting: 1) Check router power 2) Restart network adapter 3) Run network troubleshooter",
-        "np": "इन्टरनेट समस्या निवारण: १) राउटर पावर जाँच गर्नुहोस् २) नेटवर्क एडाप्टर पुनः सुरु गर्नुहोस् ३) नेटवर्क समस्या निवारक चलाउनुहोस्"
-    }
-]
-
-# ==================== CORE MODULES ====================
-class KnowledgeEngine:
-    """Enhanced knowledge base with semantic + fuzzy search"""
-    def __init__(self, db_path: str = KNOWLEDGE_DB):
-        self.db_path = db_path
-        self.semantic_model = None
-        self.semantic_embeds = None
-        self._init_db()
-        self._build_indices()
-        if _SEMANTIC_OK:
-            self._init_semantic_model()
+# ==================== DATA MODELS ====================
+@dataclass
+class KnowledgeEntry:
+    """Enhanced knowledge entry with metadata"""
+    id: str
+    content_en: str
+    content_np: str
+    aliases_en: List[str]
+    aliases_np: List[str]
+    category: str
+    priority: int = 1
+    error_codes: List[str] = None
+    created_at: datetime = None
+    updated_at: datetime = None
+    usage_count: int = 0
+    success_rate: float = 1.0
     
-    def _init_db(self):
-        """Initialize knowledge database"""
-        if not os.path.exists(self.db_path):
-            with open(self.db_path, 'w', encoding='utf-8') as f:
-                json.dump(DEFAULT_KNOWLEDGE, f, indent=2, ensure_ascii=False)
+    def __post_init__(self):
+        if self.error_codes is None:
+            self.error_codes = []
+        if self.created_at is None:
+            self.created_at = datetime.now()
+        if self.updated_at is None:
+            self.updated_at = datetime.now()
+
+@dataclass
+class QueryResult:
+    """Query result with metadata"""
+    answer: str
+    source: str
+    confidence: float
+    response_time: float
+    lang: str
+    entry_id: Optional[str] = None
+    suggestions: List[str] = None
+    
+    def __post_init__(self):
+        if self.suggestions is None:
+            self.suggestions = []
+
+@dataclass
+class SystemHealth:
+    """System health metrics"""
+    cpu_usage: float
+    memory_usage: float
+    disk_usage: float
+    network_active: bool
+    temperature: Dict[str, float]
+    uptime: float
+    processes: int
+    load_average: List[float]
+    timestamp: datetime = None
+    
+    def __post_init__(self):
+        if self.timestamp is None:
+            self.timestamp = datetime.now()
+
+# ==================== ENHANCED DATABASE ====================
+class DatabaseManager:
+    """SQLite database manager with async support"""
+    
+    def __init__(self, db_path: str):
+        self.db_path = db_path
+        self.init_db()
+    
+    def init_db(self):
+        """Initialize database with proper schema"""
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute('''
+                CREATE TABLE IF NOT EXISTS knowledge_entries (
+                    id TEXT PRIMARY KEY,
+                    content_en TEXT NOT NULL,
+                    content_np TEXT NOT NULL,
+                    aliases_en TEXT,
+                    aliases_np TEXT,
+                    category TEXT,
+                    priority INTEGER DEFAULT 1,
+                    error_codes TEXT,
+                    created_at TIMESTAMP,
+                    updated_at TIMESTAMP,
+                    usage_count INTEGER DEFAULT 0,
+                    success_rate REAL DEFAULT 1.0
+                )
+            ''')
+            
+            conn.execute('''
+                CREATE TABLE IF NOT EXISTS query_logs (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    timestamp TIMESTAMP,
+                    user_id TEXT,
+                    query TEXT,
+                    response TEXT,
+                    source TEXT,
+                    confidence REAL,
+                    response_time REAL,
+                    lang TEXT,
+                    success BOOLEAN
+                )
+            ''')
+            
+            conn.execute('''
+                CREATE TABLE IF NOT EXISTS system_metrics (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    timestamp TIMESTAMP,
+                    cpu_usage REAL,
+                    memory_usage REAL,
+                    disk_usage REAL,
+                    network_active BOOLEAN,
+                    temperature TEXT,
+                    uptime REAL
+                )
+            ''')
+            
+            # Create indexes for better performance
+            conn.execute('CREATE INDEX IF NOT EXISTS idx_category ON knowledge_entries(category)')
+            conn.execute('CREATE INDEX IF NOT EXISTS idx_priority ON knowledge_entries(priority)')
+            conn.execute('CREATE INDEX IF NOT EXISTS idx_timestamp ON query_logs(timestamp)')
+            
+            # Insert default knowledge if empty
+            if not self.get_entry_count():
+                self._insert_default_knowledge()
+    
+    def _insert_default_knowledge(self):
+        """Insert default knowledge entries"""
+        default_entries = [
+            KnowledgeEntry(
+                id="startup_issue",
+                content_en="To fix startup problems: 1) Check power connections 2) Run system diagnostics 3) Try safe mode boot 4) Check for hardware failures",
+                content_np="स्टार्टअप समस्या समाधान: १) पावर जडान जाँच गर्नुहोस् २) सिस्टम निदान चलाउनुहोस् ३) सेफ मोड बुट प्रयास गर्नुहोस् ४) हार्डवेयर विफलता जाँच गर्नुहोस्",
+                aliases_en=["startup problem", "boot issue", "won't start", "slow boot"],
+                aliases_np=["सुरु हुन्न", "धिलो खुल्छ", "बुट समस्या"],
+                category="system",
+                priority=1,
+                error_codes=["0x800F0922", "0x80070570"]
+            ),
+            KnowledgeEntry(
+                id="internet_issue",
+                content_en="Internet troubleshooting: 1) Check router power and cables 2) Restart network adapter 3) Run network diagnostics 4) Check DNS settings",
+                content_np="इन्टरनेट समस्या निवारण: १) राउटर पावर र केबल जाँच गर्नुहोस् २) नेटवर्क एडाप्टर रिस्टार्ट गर्नुहोस् ३) नेटवर्क निदान चलाउनुहोस् ४) DNS सेटिंग्स जाँच गर्नुहोस्",
+                aliases_en=["no internet", "wifi not working", "connection problem", "network down"],
+                aliases_np=["इन्टरनेट छैन", "वाइफाई काम गर्दैन", "नेटवर्क समस्या"],
+                category="network",
+                priority=1
+            ),
+            KnowledgeEntry(
+                id="slow_performance",
+                content_en="To improve system performance: 1) Close unnecessary programs 2) Clear temporary files 3) Check for malware 4) Add more RAM if needed",
+                content_np="सिस्टम प्रदर्शन सुधार गर्न: १) अनावश्यक प्रोग्राम बन्द गर्नुहोस् २) अस्थायी फाइल सफा गर्नुहोस् ३) मालवेयर जाँच गर्नुहोस् ४) आवश्यक भएमा RAM थप्नुहोस्",
+                aliases_en=["slow computer", "performance issue", "system lag", "running slow"],
+                aliases_np=["धिलो कम्प्युटर", "प्रदर्शन समस्या", "सिस्टम ढिलो"],
+                category="performance",
+                priority=2
+            )
+        ]
         
+        for entry in default_entries:
+            self.save_entry(entry)
+    
+    def save_entry(self, entry: KnowledgeEntry) -> bool:
+        """Save knowledge entry to database"""
         try:
-            with open(self.db_path, 'r', encoding='utf-8') as f:
-                self.entries = json.load(f)
-        except (json.JSONDecodeError, FileNotFoundError):
-            self.entries = DEFAULT_KNOWLEDGE
+            with sqlite3.connect(self.db_path) as conn:
+                conn.execute('''
+                    INSERT OR REPLACE INTO knowledge_entries 
+                    (id, content_en, content_np, aliases_en, aliases_np, category, priority, 
+                     error_codes, created_at, updated_at, usage_count, success_rate)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (
+                    entry.id, entry.content_en, entry.content_np,
+                    json.dumps(entry.aliases_en), json.dumps(entry.aliases_np),
+                    entry.category, entry.priority,
+                    json.dumps(entry.error_codes),
+                    entry.created_at.isoformat(), entry.updated_at.isoformat(),
+                    entry.usage_count, entry.success_rate
+                ))
+            return True
+        except Exception as e:
+            logging.error(f"Error saving entry: {e}")
+            return False
+    
+    def get_all_entries(self) -> List[KnowledgeEntry]:
+        """Get all knowledge entries"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.execute('''
+                    SELECT * FROM knowledge_entries ORDER BY priority, usage_count DESC
+                ''')
+                
+                entries = []
+                for row in cursor.fetchall():
+                    entries.append(KnowledgeEntry(
+                        id=row[0],
+                        content_en=row[1],
+                        content_np=row[2],
+                        aliases_en=json.loads(row[3]) if row[3] else [],
+                        aliases_np=json.loads(row[4]) if row[4] else [],
+                        category=row[5],
+                        priority=row[6],
+                        error_codes=json.loads(row[7]) if row[7] else [],
+                        created_at=datetime.fromisoformat(row[8]),
+                        updated_at=datetime.fromisoformat(row[9]),
+                        usage_count=row[10],
+                        success_rate=row[11]
+                    ))
+                return entries
+        except Exception as e:
+            logging.error(f"Error getting entries: {e}")
+            return []
+    
+    def get_entry_count(self) -> int:
+        """Get total number of entries"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.execute('SELECT COUNT(*) FROM knowledge_entries')
+                return cursor.fetchone()[0]
+        except:
+            return 0
+    
+    def log_query(self, query: str, result: QueryResult, user_id: str = None):
+        """Log query and result"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                conn.execute('''
+                    INSERT INTO query_logs 
+                    (timestamp, user_id, query, response, source, confidence, response_time, lang, success)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (
+                    datetime.now().isoformat(),
+                    user_id,
+                    query[:500],  # Truncate long queries
+                    result.answer[:1000],  # Truncate long responses
+                    result.source,
+                    result.confidence,
+                    result.response_time,
+                    result.lang,
+                    result.confidence > 0.5
+                ))
+        except Exception as e:
+            logging.error(f"Error logging query: {e}")
+    
+    def update_entry_usage(self, entry_id: str, success: bool = True):
+        """Update entry usage statistics"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                # Get current stats
+                cursor = conn.execute(
+                    'SELECT usage_count, success_rate FROM knowledge_entries WHERE id = ?',
+                    (entry_id,)
+                )
+                row = cursor.fetchone()
+                if row:
+                    usage_count, success_rate = row
+                    new_usage_count = usage_count + 1
+                    new_success_rate = ((success_rate * usage_count) + (1 if success else 0)) / new_usage_count
+                    
+                    conn.execute('''
+                        UPDATE knowledge_entries 
+                        SET usage_count = ?, success_rate = ?, updated_at = ?
+                        WHERE id = ?
+                    ''', (new_usage_count, new_success_rate, datetime.now().isoformat(), entry_id))
+        except Exception as e:
+            logging.error(f"Error updating entry usage: {e}")
+
+# ==================== ENHANCED KNOWLEDGE ENGINE ====================
+class AdvancedKnowledgeEngine:
+    """Advanced knowledge engine with multiple search strategies"""
+    
+    def __init__(self, config: Config):
+        self.config = config
+        self.db = DatabaseManager(config.DB_PATH)
+        self.semantic_model = None
+        self.semantic_embeddings = {}
+        self.executor = ThreadPoolExecutor(max_workers=4)
+        
+        # Initialize semantic model
+        if SEMANTIC_OK:
+            self._init_semantic_model()
+        
+        # Build search indices
+        self._build_indices()
     
     def _init_semantic_model(self):
         """Initialize semantic search model"""
         try:
             self.semantic_model = SentenceTransformer("all-MiniLM-L6-v2")
-            # Pre-compute embeddings for all entries
-            texts = [entry.get('en', '') for entry in self.entries]
-            self.semantic_embeds = self.semantic_model.encode(texts)
+            self._build_semantic_embeddings()
         except Exception as e:
-            print(f"Warning: Failed to initialize semantic model: {e}")
+            logging.error(f"Failed to initialize semantic model: {e}")
             self.semantic_model = None
+    
+    def _build_semantic_embeddings(self):
+        """Build semantic embeddings for all entries"""
+        if not self.semantic_model:
+            return
+        
+        try:
+            entries = self.db.get_all_entries()
+            texts = []
+            entry_ids = []
+            
+            for entry in entries:
+                # Create combined text for embedding
+                combined_text = f"{entry.content_en} {' '.join(entry.aliases_en)}"
+                texts.append(combined_text)
+                entry_ids.append(entry.id)
+            
+            if texts:
+                embeddings = self.semantic_model.encode(texts)
+                self.semantic_embeddings = {
+                    entry_id: embedding 
+                    for entry_id, embedding in zip(entry_ids, embeddings)
+                }
+        except Exception as e:
+            logging.error(f"Error building semantic embeddings: {e}")
     
     def _build_indices(self):
         """Build search indices for fast lookup"""
-        self.en_index = {}
-        self.np_index = {}
-        self.error_code_map = {}
+        self.indices = {
+            'en_aliases': {},
+            'np_aliases': {},
+            'error_codes': {},
+            'categories': {}
+        }
         
-        for idx, entry in enumerate(self.entries):
+        entries = self.db.get_all_entries()
+        for entry in entries:
             # English aliases
-            for alias in entry.get('aliases', []):
-                self.en_index[alias.lower()] = idx
+            for alias in entry.aliases_en:
+                self.indices['en_aliases'][alias.lower()] = entry.id
             
             # Nepali aliases
-            for alias in entry.get('np_aliases', []):
-                self.np_index[alias.lower()] = idx
+            for alias in entry.aliases_np:
+                self.indices['np_aliases'][alias.lower()] = entry.id
             
             # Error codes
-            if 'error_code' in entry:
-                self.error_code_map[entry['error_code']] = idx
+            for code in entry.error_codes:
+                self.indices['error_codes'][code.upper()] = entry.id
+            
+            # Categories
+            if entry.category not in self.indices['categories']:
+                self.indices['categories'][entry.category] = []
+            self.indices['categories'][entry.category].append(entry.id)
     
     @lru_cache(maxsize=2000)
-    def query(self, text: str, lang: str = None) -> Optional[Dict]:
-        """Hybrid search (semantic + fuzzy + exact)"""
-        if not text:
-            return None
-            
-        # Auto-detect language if not specified
+    def search(self, query: str, lang: str = None, user_id: str = None) -> QueryResult:
+        """Enhanced search with multiple strategies"""
+        start_time = time.time()
+        
+        # Auto-detect language
         if lang is None:
-            lang = 'np' if any(ord(c) > 127 for c in text) else 'en'
+            lang = self._detect_language(query)
         
-        idx = self._find_match(text, lang)
-        return self.entries[idx] if idx is not None else None
-    
-    def _find_match(self, text: str, lang: str) -> Optional[int]:
-        """Find best matching entry index"""
-        # 1. Check error codes first
-        error_code_match = re.search(r'0x[0-9A-F]{6,8}', text.upper())
-        if error_code_match:
-            code = error_code_match.group()
-            if code in self.error_code_map:
-                return self.error_code_map[code]
+        # Search strategies in order of preference
+        strategies = [
+            self._search_error_codes,
+            self._search_exact_match,
+            self._search_fuzzy_match,
+            self._search_semantic_match,
+            self._search_category_match
+        ]
         
-        # 2. Exact match in aliases
-        index = self.np_index if lang == 'np' else self.en_index
-        for token in re.findall(r'\w+', text.lower()):
-            if token in index:
-                return index[token]
+        best_result = None
+        best_confidence = 0.0
         
-        # 3. Fuzzy match
-        best_idx, best_score = None, 0
-        for phrase, idx in index.items():
-            score = fuzz.token_set_ratio(text.lower(), phrase)
-            if score > best_score and score >= 65:
-                best_idx, best_score = idx, score
-        
-        # 4. Semantic match (if enabled and fuzzy score is low)
-        if self.semantic_model and best_score < 80:
+        for strategy in strategies:
             try:
-                query_embed = self.semantic_model.encode(text)
-                scores = util.cos_sim(query_embed, self.semantic_embeds)[0]
-                semantic_idx = int(scores.argmax())
-                if scores[semantic_idx] >= 0.6:
-                    return semantic_idx
+                result = strategy(query, lang)
+                if result and result.confidence > best_confidence:
+                    best_result = result
+                    best_confidence = result.confidence
+                    
+                    # If we have a high confidence match, use it
+                    if result.confidence >= 0.9:
+                        break
             except Exception as e:
-                print(f"Semantic search error: {e}")
+                logging.error(f"Search strategy error: {e}")
         
-        return best_idx
-
-class HardwareMonitor:
-    """Real-time device diagnostics"""
-    @staticmethod
-    def system_health() -> Dict:
-        """Get comprehensive system health metrics"""
-        try:
-            health_data = {
-                'cpu_usage': psutil.cpu_percent(interval=1),
-                'ram_usage': psutil.virtual_memory().percent,
-                'disk_usage': psutil.disk_usage('/').percent,
-                'network_active': len(psutil.net_connections()) > 0,
-                'temperatures': {},
-                'disk_health': 'UNKNOWN'
-            }
-            
-            # Temperature monitoring (if available)
-            try:
-                temps = psutil.sensors_temperatures()
-                health_data['temperatures'] = {
-                    k: v[0].current for k, v in temps.items() if v
-                }
-            except:
-                health_data['temperatures'] = {}
-            
-            # Disk health check (simplified)
-            try:
-                # This is a simplified check - in reality you'd use smartctl
-                health_data['disk_health'] = 'OK' if psutil.disk_usage('/').percent < 90 else 'WARNING'
-            except:
-                health_data['disk_health'] = 'UNKNOWN'
-            
-            return health_data
-        except Exception as e:
-            return {'error': f"Failed to get system health: {e}"}
-
-class VoiceInterface:
-    """Hands-free Nepali/English support"""
-    def __init__(self):
-        if not _SPEECH_OK:
-            self.recognizer = None
-            return
-        self.recognizer = sr.Recognizer()
+        # Fallback if no good match found
+        if not best_result or best_confidence < 0.3:
+            best_result = self._generate_fallback_response(query, lang)
+        
+        # Set response time
+        best_result.response_time = time.time() - start_time
+        
+        # Log the query
+        self.db.log_query(query, best_result, user_id)
+        
+        # Update entry usage if we found a match
+        if best_result.entry_id:
+            self.db.update_entry_usage(best_result.entry_id, best_result.confidence > 0.5)
+        
+        return best_result
     
-    def listen(self, lang: str = 'en') -> Optional[str]:
-        """Listen for voice input"""
-        if not self.recognizer:
-            return None
-            
-        try:
-            with sr.Microphone() as source:
-                print("Listening...")
-                audio = self.recognizer.listen(source, timeout=5)
-            
-            language = 'ne-NP' if lang == 'np' else 'en-US'
-            return self.recognizer.recognize_google(audio, language=language)
-        except sr.WaitTimeoutError:
-            print("No speech detected")
-            return None
-        except sr.UnknownValueError:
-            print("Could not understand audio")
-            return None
-        except Exception as e:
-            print(f"Speech recognition error: {e}")
-            return None
-
-# Missing plugin classes (simplified implementations)
-class WikipediaSearch:
-    """Wikipedia search plugin"""
-    def __init__(self):
-        self.name = "wikipedia"
+    def _detect_language(self, text: str) -> str:
+        """Detect language of input text"""
+        # Simple heuristic: if text contains Devanagari characters, it's Nepali
+        return 'np' if any(ord(c) > 2303 and ord(c) < 2432 for c in text) else 'en'
     
-    def execute(self, query: str) -> Optional[str]:
-        """Search Wikipedia for query"""
-        try:
-            # Simplified - would use wikipedia library in production
-            return f"Wikipedia search for '{query}' - feature not fully implemented"
-        except Exception as e:
-            return None
-
-class WeatherAPI:
-    """Weather information plugin"""
-    def __init__(self):
-        self.name = "weather"
-    
-    def execute(self, query: str) -> Optional[str]:
-        """Get weather information"""
-        if any(word in query.lower() for word in ['weather', 'temperature', 'rain', 'मौसम']):
-            return "Weather service not configured. Please add API key."
+    def _search_error_codes(self, query: str, lang: str) -> Optional[QueryResult]:
+        """Search for error codes in query"""
+        error_pattern = r'0x[0-9A-F]{6,8}'
+        matches = re.findall(error_pattern, query.upper())
+        
+        for code in matches:
+            if code in self.indices['error_codes']:
+                entry_id = self.indices['error_codes'][code]
+                entry = self._get_entry_by_id(entry_id)
+                if entry:
+                    return QueryResult(
+                        answer=entry.content_np if lang == 'np' else entry.content_en,
+                        source='error_code',
+                        confidence=1.0,
+                        response_time=0.0,
+                        lang=lang,
+                        entry_id=entry_id
+                    )
         return None
-
-class PDFIndexer:
-    """PDF document indexing plugin"""
-    def __init__(self):
-        self.name = "pdf"
     
-    def execute(self, query: str) -> Optional[str]:
-        """Search PDF documents"""
-        if not _PDF_OK:
+    def _search_exact_match(self, query: str, lang: str) -> Optional[QueryResult]:
+        """Search for exact matches in aliases"""
+        query_lower = query.lower()
+        index_key = 'np_aliases' if lang == 'np' else 'en_aliases'
+        
+        if query_lower in self.indices[index_key]:
+            entry_id = self.indices[index_key][query_lower]
+            entry = self._get_entry_by_id(entry_id)
+            if entry:
+                return QueryResult(
+                    answer=entry.content_np if lang == 'np' else entry.content_en,
+                    source='exact_match',
+                    confidence=1.0,
+                    response_time=0.0,
+                    lang=lang,
+                    entry_id=entry_id
+                )
+        return None
+    
+    def _search_fuzzy_match(self, query: str, lang: str) -> Optional[QueryResult]:
+        """Search using fuzzy string matching"""
+        if not FUZZY_OK:
             return None
-        return f"PDF search for '{query}' - feature not fully implemented"
-
-class CRMLinker:
-    """CRM integration plugin"""
-    def __init__(self, api_key: str = None):
-        self.name = "ticket"
-        self.api_key = api_key
+        
+        index_key = 'np_aliases' if lang == 'np' else 'en_aliases'
+        aliases = list(self.indices[index_key].keys())
+        
+        if aliases:
+            match = process.extractOne(query.lower(), aliases, scorer=fuzz.token_sort_ratio)
+            if match and match[1] >= self.config.FUZZY_THRESHOLD:
+                entry_id = self.indices[index_key][match[0]]
+                entry = self._get_entry_by_id(entry_id)
+                if entry:
+                    confidence = match[1] / 100.0
+                    return QueryResult(
+                        answer=entry.content_np if lang == 'np' else entry.content_en,
+                        source='fuzzy_match',
+                        confidence=confidence,
+                        response_time=0.0,
+                        lang=lang,
+                        entry_id=entry_id
+                    )
+        return None
     
-    def execute(self, query: str) -> Optional[str]:
-        """Link to CRM system"""
-        if not self.api_key:
+    def _search_semantic_match(self, query: str, lang: str) -> Optional[QueryResult]:
+        """Search using semantic similarity"""
+        if not self.semantic_model or not self.semantic_embeddings:
             return None
-        return f"CRM integration for '{query}' - feature not fully implemented"
+        
+        try:
+            query_embedding = self.semantic_model.encode(query)
+            best_match_id = None
+            best_similarity = 0.0
+            
+            for entry_id, entry_embedding in self.semantic_embeddings.items():
+                similarity = util.cos_sim(query_embedding, entry_embedding).item()
+                if similarity > best_similarity:
+                    best_similarity = similarity
+                    best_match_id = entry_id
+            
+            if best_similarity >= self.config.SEMANTIC_THRESHOLD:
+                entry = self._get_entry_by_id(best_match_id)
+                if entry:
+                    return QueryResult(
+                        answer=entry.content_np if lang == 'np' else entry.content_en,
+                        source='semantic_match',
+                        confidence=best_similarity,
+                        response_time=0.0,
+                        lang=lang,
+                        entry_id=best_match_id
+                    )
+        except Exception as e:
+            logging.error(f"Semantic search error: {e}")
+        
+        return None
+    
+    def _search_category_match(self, query: str, lang: str) -> Optional[QueryResult]:
+        """Search by category keywords"""
+        category_keywords = {
+            'system': ['system', 'startup', 'boot', 'computer', 'सिस्टम', 'कम्प्युटर'],
+            'network': ['internet', 'network', 'wifi', 'connection', 'इन्टरनेट', 'नेटवर्क'],
+            'performance': ['slow', 'performance', 'speed', 'lag', 'धिलो', 'प्रदर्शन'],
+            'hardware': ['hardware', 'device', 'monitor', 'keyboard', 'हार्डवेयर'],
+            'software': ['software', 'program', 'application', 'app', 'सफ्टवेयर']
+        }
+        
+        query_lower = query.lower()
+        for category, keywords in category_keywords.items():
+            if any(keyword in query_lower for keyword in keywords):
+                if category in self.indices['categories']:
+                    entry_ids = self.indices['categories'][category]
+                    if entry_ids:
+                        # Return the highest priority entry from this category
+                        entry_id = entry_ids[0]  # Already sorted by priority
+                        entry = self._get_entry_by_id(entry_id)
+                        if entry:
+                            return QueryResult(
+                                answer=entry.content_np if lang == 'np' else entry.content_en,
+                                source='category_match',
+                                confidence=0.6,
+                                response_time=0.0,
+                                lang=lang,
+                                entry_id=entry_id
+                            )
+        return None
+    
+    def _get_entry_by_id(self, entry_id: str) -> Optional[KnowledgeEntry]:
+        """Get entry by ID from database"""
+        entries = self.db.get_all_entries()
+        for entry in entries:
+            if entry.id == entry_id:
+                return entry
+        return None
+    
+    def _generate_fallback_response(self, query: str, lang: str) -> QueryResult:
+        """Generate fallback response when no match is found"""
+        if lang == 'np':
+            answer = f"माफ गर्नुहोस्, '{query}' को बारेमा विशिष्ट जानकारी फेला परेन। कृपया हाम्रो सहयोग टोलीलाई सम्पर्क गर्नुहोस्।"
+        else:
+            answer = f"I couldn't find specific information about '{query}'. Please contact our support team for detailed assistance."
+        
+        return QueryResult(
+            answer=answer,
+            source='fallback',
+            confidence=0.1,
+            response_time=0.0,
+            lang=lang,
+            suggestions=self._generate_suggestions(query, lang)
+        )
+    
+    def _generate_suggestions(self, query: str, lang: str) -> List[str]:
+        """Generate suggestions for similar queries"""
+        suggestions = []
+        try:
+            entries = self.db.get_all_entries()
+            
+            # Get top 3 most used entries as suggestions
+            top_entries = sorted(entries, key=lambda x: x.usage_count, reverse=True)[:3]
+            
+            for entry in top_entries:
+                if lang == 'np' and entry.aliases_np:
+                    suggestions.append(entry.aliases_np[0])
+                elif lang == 'en' and entry.aliases_en:
+                    suggestions.append(entry.aliases_en[0])
+        except Exception as e:
+            logging.error(f"Error generating suggestions: {e}")
+        
+        return suggestions
 
-# ==================== INTEGRATED BRAIN ====================
-class WhisperbladeUltimate:
-    """Main AI brain orchestrator"""
-    def __init__(self):
-        self.knowledge = KnowledgeEngine()
-        self.hardware = HardwareMonitor()
-        self.voice = VoiceInterface()
-        self._init_plugins()
-        self._setup_logging()
+# ==================== ENHANCED HARDWARE MONITOR ====================
+class EnhancedHardwareMonitor:
+    """Advanced hardware monitoring with predictive analytics"""
     
-    def _setup_logging(self):
-        """Setup logging for debugging with Unicode support"""
-        # Create formatters
-        formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-        
-        # File handler with UTF-8 encoding
-        file_handler = logging.FileHandler('whisperblade.log', encoding='utf-8')
-        file_handler.setFormatter(formatter)
-        
-        # Console handler with UTF-8 encoding (Windows fix)
-        console_handler = logging.StreamHandler()
-        console_handler.setFormatter(formatter)
-        
-        # Configure logger
-        self.logger = logging.getLogger(__name__)
-        self.logger.setLevel(logging.INFO)
-        self.logger.addHandler(file_handler)
-        self.logger.addHandler(console_handler)
-        
-        # Prevent duplicate logs
-        self.logger.propagate = False
-    
-    def _init_plugins(self):
-        """Initialize all plugins"""
-        self.plugins = {
-            'wikipedia': WikipediaSearch(),
-            'weather': WeatherAPI(),
-            'pdf': PDFIndexer(),
-            'ticket': CRMLinker(api_key=os.getenv('TECHSEWA_CRM_KEY'))
+    def __init__(self, config: Config):
+        self.config = config
+        self.enabled = HW_MONITOR_OK and config.ENABLE_HARDWARE_MONITORING
+        self.alert_thresholds = {
+            'cpu': 80.0,
+            'memory': 85.0,
+            'disk': 90.0,
+            'temperature': 70.0
         }
     
-    def process(self, input_data: Dict) -> Dict:
-        """Unified processing for text/voice/sensor inputs"""
-        self.logger.info(f"Processing input: {input_data}")
+    def get_system_health(self) -> SystemHealth:
+        """Get comprehensive system health metrics"""
+        if not self.enabled:
+            return SystemHealth(
+                cpu_usage=0.0,
+                memory_usage=0.0,
+                disk_usage=0.0,
+                network_active=False,
+                temperature={},
+                uptime=0.0,
+                processes=0,
+                load_average=[]
+            )
         
         try:
-            # Voice input
-            if input_data.get('audio'):
-                query = self.voice.listen(input_data.get('lang', 'en'))
-                if not query:
-                    return {'error': 'Voice recognition failed'}
+            # Get system metrics
+            cpu_percent = psutil.cpu_percent(interval=1)
+            memory = psutil.virtual_memory()
+            disk = psutil.disk_usage('/')
+            network = psutil.net_io_counters()
             
-            # Hardware diagnostics
-            elif input_data.get('sensor_readings'):
+            # Temperature monitoring
+            temperatures = {}
+            try:
+                if hasattr(psutil, 'sensors_temperatures'):
+                    temp_sensors = psutil.sensors_temperatures()
+                    for sensor_name, sensor_list in temp_sensors.items():
+                        if sensor_list:
+                            temperatures[sensor_name] = sensor_list[0].current
+            except Exception:
+                pass
+            
+            # Load average (Unix-like systems)
+            load_avg = []
+            try:
+                if hasattr(os, 'getloadavg'):
+                    load_avg = list(os.getloadavg())
+            except Exception:
+                pass
+            
+            return SystemHealth(
+                cpu_usage=cpu_percent,
+                memory_usage=memory.percent,
+                disk_usage=disk.percent,
+                network_active=network.bytes_sent > 0 or network.bytes_recv > 0,
+                temperature=temperatures,
+                uptime=time.time() - psutil.boot_time(),
+                processes=len(psutil.pids()),
+                load_average=load_avg
+            )
+        except Exception as e:
+            logging.error(f"Error getting system health: {e}")
+            return SystemHealth(
+                cpu_usage=0.0,
+                memory_usage=0.0,
+                disk_usage=0.0,
+                network_active=False,
+                temperature={},
+                uptime=0.0,
+                processes=0,
+                load_average=[]
+            )
+    
+    def get_health_alerts(self) -> List[str]:
+        """Get current health alerts"""
+        if not self.enabled:
+            return []
+        
+        alerts = []
+        health = self.get_system_health()
+        
+        if health.cpu_usage > self.alert_thresholds['cpu']:
+            alerts.append(f"High CPU usage: {health.cpu_usage:.1f}%")
+        
+        if health.memory_usage > self.alert_thresholds['memory']:
+            alerts.append(f"High memory usage: {health.memory_usage:.1f}%")
+        
+        if health.disk_usage > self.alert_thresholds['disk']:
+            alerts.append(f"High disk usage: {health.disk_usage:.1f}%")
+        
+        for sensor, temp in health.temperature.items():
+            if temp > self.alert_thresholds['temperature']:
+                alerts.append(f"High temperature {sensor}: {temp:.1f}°C")
+        
+        return alerts
+    
+    def generate_health_report(self, lang: str = 'en') -> str:
+        """Generate comprehensive health report"""
+        if not self.enabled:
+            return "Hardware monitoring is disabled" if lang == 'en' else "हार्डवेयर मनिटरिङ असक्षम छ"
+        
+        health = self.get_system_health()
+        alerts = self.get_health_alerts()
+        
+        if lang == 'np':
+            report = f"""
+🖥️ सिस्टम स्वास्थ्य रिपोर्ट
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ CPU उपयोग: {health.cpu_usage:.1f}%
+💾 मेमोरी उपयोग: {health.memory_usage:.1f}%
+💿 डिस्क उपयोग: {health.disk_usage:.1f}%
+🌐 नेटवर्क: {'सक्रिय' if health.network_active else 'निष्क्रिय'}
+🔄 प्रक्रियाहरू: {health.processes}
+⏱️ अपटाइम: {health.uptime/3600:.1f} घण्टा
+"""
+            if health.temperature:
+                report += "\n🌡️ तापमान:\n"
+                for sensor, temp in health.temperature.items():
+                    report += f"  • {sensor}: {temp:.1f}°C\n"
+            
+            if alerts:
+                report += "\n⚠️ चेतावनीहरू:\n"
+                for alert in alerts:
+                    report += f"  • {alert}\n"
+            else:
+                report += "\n✅ सबै सिस्टम सामान्य छन्\n"
+        else:
+            report = f"""
+🖥️ System Health Report
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚡ CPU Usage: {health.cpu_usage:.1f}%
+💾 Memory Usage: {health.memory_usage:.1f}%
+💿 Disk Usage: {health.disk_usage:.1f}%
+🌐 Network: {'Active' if health.network_active else 'Inactive'}
+🔄 Processes: {health.processes}
+⏱️ Uptime: {health.uptime/3600:.1f} hours
+"""
+            if health.temperature:
+                report += "\n🌡️ Temperatures:\n"
+                for sensor, temp in health.temperature.items():
+                    report += f"  • {sensor}: {temp:.1f}°C\n"
+            
+            if alerts:
+                report += "\n⚠️ Alerts:\n"
+                for alert in alerts:
+                    report += f"  • {alert}\n"
+            else:
+                report += "\n✅ All systems normal\n"
+        
+        return report
+
+# ==================== ENHANCED VOICE INTERFACE ====================
+class EnhancedVoiceInterface:
+    """Advanced voice interface with TTS support"""
+    
+    def __init__(self, config: Config):
+        self.config = config
+        self.enabled = SPEECH_OK and config.ENABLE_VOICE
+        self.recognizer = None
+        self.tts_engine = None
+        
+        if self.enabled:
+            self._init_voice_components()
+    
+    def _init_voice_components(self):
+        """Initialize voice recognition and TTS components"""
+        try:
+            self.recognizer = sr.Recognizer()
+            self.tts_engine = pyttsx3.init()
+            
+            # Configure TTS settings
+            self.tts_engine.setProperty('rate', 150)  # Speed of speech
+            self.tts_engine.setProperty('volume', 0.8)  # Volume level
+            
+            # Try to set voice (prefer female voice for better clarity)
+            voices = self.tts_engine.getProperty('voices')
+            if voices:
+                for voice in voices:
+                    if 'female' in voice.name.lower() or 'zira' in voice.name.lower():
+                        self.tts_engine.setProperty('voice', voice.id)
+                        break
+                        
+        except Exception as e:
+            logging.error(f"Error initializing voice components: {e}")
+            self.enabled = False
+    
+    async def listen_async(self, lang: str = 'en', timeout: int = 5) -> Optional[str]:
+        """Asynchronous voice input with timeout"""
+        if not self.enabled:
+            return None
+        
+        try:
+            loop = asyncio.get_event_loop()
+            return await loop.run_in_executor(None, self._listen_sync, lang, timeout)
+        except Exception as e:
+            logging.error(f"Async voice recognition error: {e}")
+            return None
+    
+    def _listen_sync(self, lang: str, timeout: int) -> Optional[str]:
+        """Synchronous voice input"""
+        try:
+            with sr.Microphone() as source:
+                print("🎤 Listening..." if lang == 'en' else "🎤 सुन्दै...")
+                
+                # Adjust for ambient noise
+                self.recognizer.adjust_for_ambient_noise(source, duration=1)
+                
+                # Listen for audio
+                audio = self.recognizer.listen(source, timeout=timeout, phrase_time_limit=10)
+            
+            # Recognize speech
+            language_code = 'ne-NP' if lang == 'np' else 'en-US'
+            text = self.recognizer.recognize_google(audio, language=language_code)
+            
+            print(f"🎯 Recognized: {text}")
+            return text
+            
+        except sr.WaitTimeoutError:
+            print("⏱️ No speech detected")
+            return None
+        except sr.UnknownValueError:
+            print("❌ Could not understand audio")
+            return None
+        except Exception as e:
+            logging.error(f"Voice recognition error: {e}")
+            return None
+    
+    def speak(self, text: str, lang: str = 'en'):
+        """Text-to-speech output"""
+        if not self.enabled or not text:
+            return
+        
+        try:
+            # For Nepali, we might need to use a different approach
+            # or convert to English pronunciation
+            if lang == 'np':
+                # For now, we'll speak in English about Nepali content
+                text = f"Response in Nepali: {text}"
+            
+            self.tts_engine.say(text)
+            self.tts_engine.runAndWait()
+            
+        except Exception as e:
+            logging.error(f"TTS error: {e}")
+    
+    async def speak_async(self, text: str, lang: str = 'en'):
+        """Asynchronous text-to-speech"""
+        if not self.enabled:
+            return
+        
+        try:
+            loop = asyncio.get_event_loop()
+            await loop.run_in_executor(None, self.speak, text, lang)
+        except Exception as e:
+            logging.error(f"Async TTS error: {e}")
+
+# ==================== ENHANCED PLUGINS ====================
+class WebSearchPlugin:
+    """Enhanced web search plugin with caching"""
+    
+    def __init__(self, config: Config):
+        self.config = config
+        self.enabled = WEB_OK and config.ENABLE_WEB_SEARCH
+        self.cache = {}
+        self.cache_timeout = 3600  # 1 hour
+    
+    async def search_async(self, query: str, lang: str = 'en') -> Optional[str]:
+        """Asynchronous web search"""
+        if not self.enabled:
+            return None
+        
+        # Check cache first
+        cache_key = f"{query}_{lang}"
+        if cache_key in self.cache:
+            cached_result, timestamp = self.cache[cache_key]
+            if time.time() - timestamp < self.cache_timeout:
+                return cached_result
+        
+        try:
+            # Perform web search
+            search_query = f"{query} site:techsewa.com OR site:support.microsoft.com"
+            
+            async with aiohttp.ClientSession() as session:
+                search_url = f"https://www.google.com/search?q={search_query}"
+                headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+                
+                async with session.get(search_url, headers=headers) as response:
+                    if response.status == 200:
+                        html = await response.text()
+                        result = self._parse_search_results(html)
+                        
+                        # Cache the result
+                        self.cache[cache_key] = (result, time.time())
+                        return result
+        except Exception as e:
+            logging.error(f"Web search error: {e}")
+        
+        return None
+    
+    def _parse_search_results(self, html: str) -> str:
+        """Parse search results from HTML"""
+        try:
+            soup = BeautifulSoup(html, 'html.parser')
+            
+            # Look for relevant snippets
+            snippets = []
+            for result in soup.find_all('div', class_='VwiC3b'):
+                text = result.get_text().strip()
+                if text and len(text) > 50:
+                    snippets.append(text)
+            
+            if snippets:
+                return f"Web search results: {snippets[0][:300]}..."
+            else:
+                return "No relevant web results found"
+                
+        except Exception as e:
+            logging.error(f"Error parsing search results: {e}")
+            return "Error parsing search results"
+
+class DocumentProcessor:
+    """Enhanced document processing plugin"""
+    
+    def __init__(self, config: Config):
+        self.config = config
+        self.enabled = DOCUMENT_OK
+        self.supported_formats = ['.pdf', '.docx', '.txt']
+    
+    def process_document(self, file_path: str) -> Optional[str]:
+        """Process various document formats"""
+        if not self.enabled:
+            return None
+        
+        try:
+            file_ext = Path(file_path).suffix.lower()
+            
+            if file_ext == '.pdf':
+                return self._process_pdf(file_path)
+            elif file_ext == '.docx':
+                return self._process_docx(file_path)
+            elif file_ext == '.txt':
+                return self._process_txt(file_path)
+            else:
+                return f"Unsupported file format: {file_ext}"
+                
+        except Exception as e:
+            logging.error(f"Document processing error: {e}")
+            return None
+    
+    def _process_pdf(self, file_path: str) -> str:
+        """Process PDF files"""
+        try:
+            text = ""
+            with open(file_path, 'rb') as file:
+                pdf_reader = PyPDF2.PdfReader(file)
+                for page in pdf_reader.pages:
+                    text += page.extract_text() + "\n"
+            return text.strip()
+        except Exception as e:
+            return f"Error processing PDF: {e}"
+    
+    def _process_docx(self, file_path: str) -> str:
+        """Process DOCX files"""
+        try:
+            doc = docx.Document(file_path)
+            text = ""
+            for paragraph in doc.paragraphs:
+                text += paragraph.text + "\n"
+            return text.strip()
+        except Exception as e:
+            return f"Error processing DOCX: {e}"
+    
+    def _process_txt(self, file_path: str) -> str:
+        """Process text files"""
+        try:
+            with open(file_path, 'r', encoding='utf-8') as file:
+                return file.read()
+        except Exception as e:
+            return f"Error processing text file: {e}"
+
+# ==================== MAIN WHISPERBLADE SYSTEM ====================
+class WhisperBladeUltimate:
+    """Enhanced WhisperBlade Ultimate System"""
+    
+    def __init__(self, config: Config = None):
+        self.config = config or Config()
+        self._setup_logging()
+        self._init_components()
+        self.session_stats = {
+            'queries_processed': 0,
+            'avg_response_time': 0.0,
+            'success_rate': 0.0,
+            'start_time': datetime.now()
+        }
+    
+    def _setup_logging(self):
+        """Setup enhanced logging"""
+        logging.basicConfig(
+            level=getattr(logging, self.config.LOG_LEVEL),
+            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+            handlers=[
+                logging.FileHandler('whisperblade_enhanced.log', encoding='utf-8'),
+                logging.StreamHandler()
+            ]
+        )
+        self.logger = logging.getLogger(__name__)
+    
+    def _init_components(self):
+        """Initialize all system components"""
+        self.logger.info("Initializing WhisperBlade Ultimate Enhanced...")
+        
+        # Core components
+        self.knowledge_engine = AdvancedKnowledgeEngine(self.config)
+        self.hardware_monitor = EnhancedHardwareMonitor(self.config)
+        self.voice_interface = EnhancedVoiceInterface(self.config)
+        
+        # Plugins
+        self.web_search = WebSearchPlugin(self.config)
+        self.document_processor = DocumentProcessor(self.config)
+        
+        self.logger.info("All components initialized successfully")
+    
+    async def process_async(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """Asynchronous request processing"""
+        start_time = time.time()
+        
+        try:
+            # Extract request parameters
+            query = request.get('query', '')
+            lang = request.get('lang', 'en')
+            user_id = request.get('user_id')
+            input_type = request.get('type', 'text')  # text, voice, hardware
+            
+            # Process different input types
+            if input_type == 'voice':
+                # Voice input
+                spoken_query = await self.voice_interface.listen_async(lang)
+                if not spoken_query:
+                    return {'error': 'Voice recognition failed', 'success': False}
+                query = spoken_query
+            
+            elif input_type == 'hardware':
+                # Hardware diagnostic request
+                health_report = self.hardware_monitor.generate_health_report(lang)
                 return {
-                    'source': 'hardware',
-                    'answer': self.hardware.system_health()
+                    'answer': health_report,
+                    'source': 'hardware_monitor',
+                    'confidence': 1.0,
+                    'response_time': time.time() - start_time,
+                    'lang': lang,
+                    'success': True
                 }
             
-            # Standard text query
-            else:
-                query = input_data.get('text', '')
-                
             if not query:
-                return {'error': 'No query provided'}
+                return {'error': 'No query provided', 'success': False}
             
-            # Process through all intelligence layers
-            response = self._generate_response(query, input_data.get('lang'))
-            self._log_to_crm(query, response, input_data.get('user_id'))
+            # Process through knowledge engine
+            result = self.knowledge_engine.search(query, lang, user_id)
+            
+            # If no good match, try web search
+            if result.confidence < 0.5:
+                web_result = await self.web_search.search_async(query, lang)
+                if web_result:
+                    result = QueryResult(
+                        answer=web_result,
+                        source='web_search',
+                        confidence=0.7,
+                        response_time=time.time() - start_time,
+                        lang=lang
+                    )
+            
+            # Update session statistics
+            self._update_session_stats(result)
+            
+            # Prepare response
+            response = {
+                'answer': result.answer,
+                'source': result.source,
+                'confidence': result.confidence,
+                'response_time': result.response_time,
+                'lang': lang,
+                'suggestions': result.suggestions,
+                'support_info': self.config.SUPPORT_CONTACT,
+                'success': True
+            }
+            
+            # Voice output if requested
+            if request.get('voice_output', False):
+                await self.voice_interface.speak_async(result.answer, lang)
+            
             return response
             
         except Exception as e:
             self.logger.error(f"Processing error: {e}")
-            return {'error': f'Processing failed: {str(e)}'}
-    
-    def _generate_response(self, query: str, lang: str = None) -> Dict:
-        """Generate response using multiple intelligence layers"""
-        # 1. Local knowledge base
-        if match := self.knowledge.query(query, lang):
             return {
-                'source': 'local',
-                'answer': match.get(lang or 'en', match.get('en', 'No answer found')),
-                'support_info': SUPPORT_INFO
+                'error': str(e),
+                'success': False,
+                'response_time': time.time() - start_time
             }
+    
+    def process_sync(self, request: Dict[str, Any]) -> Dict[str, Any]:
+        """Synchronous request processing for compatibility"""
+        return asyncio.run(self.process_async(request))
+    
+    def _update_session_stats(self, result: QueryResult):
+        """Update session statistics"""
+        self.session_stats['queries_processed'] += 1
         
-        # 2. Try plugins
-        for plugin_name, plugin in self.plugins.items():
-            try:
-                if result := plugin.execute(query):
-                    return {
-                        'source': plugin_name,
-                        'answer': result,
-                        'support_info': SUPPORT_INFO
-                    }
-            except Exception as e:
-                self.logger.warning(f"Plugin {plugin_name} failed: {e}")
+        # Update average response time
+        current_avg = self.session_stats['avg_response_time']
+        count = self.session_stats['queries_processed']
+        self.session_stats['avg_response_time'] = (
+            (current_avg * (count - 1) + result.response_time) / count
+        )
         
-        # 3. Fallback response
+        # Update success rate
+        success = result.confidence > 0.5
+        current_success_rate = self.session_stats['success_rate']
+        self.session_stats['success_rate'] = (
+            (current_success_rate * (count - 1) + (1 if success else 0)) / count
+        )
+    
+    def get_session_stats(self) -> Dict[str, Any]:
+        """Get current session statistics"""
+        uptime = datetime.now() - self.session_stats['start_time']
         return {
-            'source': 'fallback',
-            'answer': self._get_fallback_response(query, lang),
-            'support_info': SUPPORT_INFO
+            **self.session_stats,
+            'uptime_seconds': uptime.total_seconds(),
+            'system_health': self.hardware_monitor.get_system_health(),
+            'health_alerts': self.hardware_monitor.get_health_alerts()
         }
     
-    def _get_fallback_response(self, query: str, lang: str = None) -> str:
-        """Generate fallback response when no match found"""
-        if lang == 'np':
-            return f"माफ गर्नुहोस्, '{query}' को बारेमा जानकारी फेला परेन। कृपया हाम्रो सहयोग टोलीलाई सम्पर्क गर्नुहोस्।"
-        else:
-            return f"Sorry, I couldn't find information about '{query}'. Please contact our support team for assistance."
-    
-    def _log_to_crm(self, query: str, response: Dict, user_id: str = None):
-        """Log interaction to CRM system with Unicode-safe logging"""
+    def add_knowledge_entry(self, entry: KnowledgeEntry) -> bool:
+        """Add new knowledge entry"""
         try:
-            # Simplified CRM logging
-            log_entry = {
-                'timestamp': time.time(),
-                'user_id': user_id,
-                'query': query[:50] + '...' if len(query) > 50 else query,  # Truncate long queries
-                'response_source': response.get('source'),
-                'success': 'error' not in response
-            }
-            
-            # Safe logging for Unicode characters
-            try:
-                self.logger.info(f"CRM Log: {log_entry}")
-            except UnicodeEncodeError:
-                # Fallback: log without the query text
-                safe_log = {k: v for k, v in log_entry.items() if k != 'query'}
-                safe_log['query'] = '[Unicode query logged to file]'
-                self.logger.info(f"CRM Log: {safe_log}")
-                
+            success = self.knowledge_engine.db.save_entry(entry)
+            if success:
+                # Rebuild indices and embeddings
+                self.knowledge_engine._build_indices()
+                if self.knowledge_engine.semantic_model:
+                    self.knowledge_engine._build_semantic_embeddings()
+                self.logger.info(f"Added knowledge entry: {entry.id}")
+            return success
         except Exception as e:
-            self.logger.warning(f"CRM logging failed: {e}")
-
-# ==================== DEPLOYMENT READY ====================
-def main():
-    """Main entry point for testing"""
-    # Set UTF-8 encoding for Windows console
-    import sys
-    if sys.platform == 'win32':
-        import os
-        os.system('chcp 65001 > nul')  # Set console to UTF-8
+            self.logger.error(f"Error adding knowledge entry: {e}")
+            return False
     
-    brain = WhisperbladeUltimate()
+    def backup_knowledge_base(self, backup_path: str) -> bool:
+        """Backup knowledge base to file"""
+        try:
+            import shutil
+            shutil.copy2(self.config.DB_PATH, backup_path)
+            self.logger.info(f"Knowledge base backed up to: {backup_path}")
+            return True
+        except Exception as e:
+            self.logger.error(f"Backup failed: {e}")
+            return False
+
+# ==================== MAIN ENTRY POINT ====================
+async def main():
+    """Main entry point for testing"""
+    print("🚀 WhisperBlade Ultimate Enhanced - Starting...")
+    
+    # Initialize system
+    config = Config()
+    system = WhisperBladeUltimate(config)
     
     # Test queries
     test_queries = [
-        {'text': 'startup problem', 'lang': 'en'},
-        {'text': 'इन्टरनेट छैन', 'lang': 'np'},
-        {'text': 'weather today', 'lang': 'en'},
-        {'sensor_readings': True}
+        {'query': 'startup problem', 'lang': 'en', 'type': 'text'},
+        {'query': 'इन्टरनेट छैन', 'lang': 'np', 'type': 'text'},
+        {'query': 'slow computer performance', 'lang': 'en', 'type': 'text'},
+        {'type': 'hardware'},
+        {'query': 'error code 0x800F0922', 'lang': 'en', 'type': 'text'}
     ]
     
-    print("🧠 WhisperBlade Ultimate - Testing Suite")
-    print("=" * 50)
+    print("\n" + "="*60)
+    print("🧠 WHISPERBLADE ULTIMATE ENHANCED - TEST SUITE")
+    print("="*60)
     
     for i, query in enumerate(test_queries, 1):
         print(f"\n🔍 Test {i}: {query}")
-        try:
-            response = brain.process(query)
-            print(f"✅ Response: {response}")
-        except Exception as e:
-            print(f"❌ Error: {e}")
         print("-" * 50)
+        
+        try:
+            response = await system.process_async(query)
+            
+            if response.get('success'):
+                print(f"✅ Answer: {response['answer'][:200]}...")
+                print(f"📊 Source: {response['source']}")
+                print(f"🎯 Confidence: {response['confidence']:.2f}")
+                print(f"⏱️ Response Time: {response['response_time']:.3f}s")
+                
+                if response.get('suggestions'):
+                    print(f"💡 Suggestions: {', '.join(response['suggestions'])}")
+            else:
+                print(f"❌ Error: {response.get('error', 'Unknown error')}")
+                
+        except Exception as e:
+            print(f"💥 Exception: {e}")
+    
+    # Display session statistics
+    print("\n" + "="*60)
+    print("📈 SESSION STATISTICS")
+    print("="*60)
+    
+    stats = system.get_session_stats()
+    print(f"Queries Processed: {stats['queries_processed']}")
+    print(f"Average Response Time: {stats['avg_response_time']:.3f}s")
+    print(f"Success Rate: {stats['success_rate']:.2%}")
+    print(f"Uptime: {stats['uptime_seconds']:.1f} seconds")
+    
+    if stats['health_alerts']:
+        print(f"\n⚠️ Health Alerts: {len(stats['health_alerts'])}")
+        for alert in stats['health_alerts']:
+            print(f"  • {alert}")
+    else:
+        print("\n✅ No health alerts")
 
-def handle_app_request(request):
-    """Integration function for other app modules"""
-    brain = WhisperbladeUltimate()
-    return brain.process({
-        'text': request.get('query', ''),
-        'lang': request.get('lang'),
-        'user_id': request.get('user_id')
-    })
+def handle_app_request(request: Dict[str, Any]) -> Dict[str, Any]:
+    """Legacy compatibility function"""
+    config = Config()
+    system = WhisperBladeUltimate(config)
+    return system.process_sync(request)
 
 if __name__ == '__main__':
-    main()
+    # Set UTF-8 encoding for Windows
+    import sys
+    if sys.platform == 'win32':
+        import os
+        os.system('chcp 65001 > nul')
+    
+    # Run main function
+    asyncio.run(main())
