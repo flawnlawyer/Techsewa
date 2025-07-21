@@ -1,0 +1,110 @@
+{
+  "version": "1.0.0",
+  "brain_name": "Whispherblade",
+  "personality": {
+    "sarcasm_mode": true,
+    "sass_level": 7,
+    "politeness_threshold": 0.3,
+    "healing_philosophy": "digital_saint",
+    "preferred_insults": ["human", "digital_peasant", "code_monkey"]
+  },
+  "modules": {
+    "enabled": [
+      "problem_detector",
+      "auto_healer", 
+      "hardware_scanner",
+      "elite_antivirus",
+      "nepali_tts",
+      "chat_engine",
+      "plugin_manager"
+    ],
+    "auto_load": true,
+    "fallback_mode": true
+  },
+  "healing": {
+    "auto_heal": false,
+    "max_concurrent_heals": 3,
+    "backup_before_heal": true,
+    "risk_tolerance": "medium",
+    "healing_cooldown": 60
+  },
+  "diagnostics": {
+    "auto_diagnose": true,
+    "diagnostic_interval": 300,
+    "background_monitoring": true,
+    "alert_thresholds": {
+      "cpu_warning": 80,
+      "memory_warning": 85,
+      "disk_warning": 90,
+      "temperature_warning": 75
+    }
+  },
+  "apis": {
+    "free_apis_only": true,
+    "api_timeout": 10,
+    "max_retries": 3,
+    "fallback_enabled": true,
+    "rate_limit": {
+      "requests_per_minute": 60,
+      "burst_limit": 10
+    }
+  },
+  "knowledge": {
+    "database_path": "whispherblade.db",
+    "import_legacy": true,
+    "auto_learn": true,
+    "confidence_threshold": 0.7,
+    "max_knowledge_entries": 10000
+  },
+  "logging": {
+    "log_level": "INFO",
+    "log_file": "whispherblade.log",
+    "max_log_size": "10MB",
+    "backup_count": 5,
+    "sarcasm_logging": true
+  },
+  "security": {
+    "safe_mode": false,
+    "require_confirmation": ["system_changes", "file_deletions"],
+    "quarantine_suspicious": true,
+    "backup_critical_files": true
+  },
+  "ui": {
+    "theme": "dark_cyber",
+    "font_family": "monospace",
+    "animation_speed": "medium",
+    "show_ascii_art": true,
+    "color_scheme": {
+      "primary": "#00ff41",
+      "secondary": "#ff0080", 
+      "warning": "#ffaa00",
+      "error": "#ff0040",
+      "success": "#40ff00"
+    }
+  },
+  "voice": {
+    "enabled": true,
+    "language": "en",
+    "voice_rate": 168,
+    "voice_volume": 90,
+    "sarcasm_tone": true,
+    "nepali_support": true
+  },
+  "free_apis": {
+    "ip_geolocation": "https://ipapi.co/json/",
+    "weather_service": "https://wttr.in/",
+    "dns_resolver": "https://dns.google/resolve",
+    "ssl_checker": "https://ssl-checker.io/api/v1/check/",
+    "threat_intel": "https://otx.alienvault.com/api/v1/indicators/",
+    "time_sync": "http://worldtimeapi.org/api/timezone/",
+    "system_info": "https://httpbin.org/user-agent",
+    "cert_transparency": "https://crt.sh/"
+  },
+  "experimental": {
+    "ai_learning": true,
+    "predictive_healing": false,
+    "quantum_sarcasm": false,
+    "self_improvement": true,
+    "dream_mode": false
+  }
+}

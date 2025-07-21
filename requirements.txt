@@ -1,0 +1,111 @@
+# 🧠 WHISPHERBLADE - The Ultimate AI Brain Dependencies
+# =====================================================
+# Core dependencies for the greatest open-source AI brain ever made
+
+# Core Python libraries (usually built-in)
+asyncio
+sqlite3
+json
+hashlib
+logging
+pathlib
+dataclasses
+typing
+functools
+concurrent.futures
+threading
+traceback
+inspect
+subprocess
+tempfile
+shutil
+platform
+socket
+ssl
+re
+time
+datetime
+os
+sys
+
+# Essential third-party packages
+requests>=2.25.0          # HTTP requests for API calls
+psutil>=5.8.0            # System and process utilities
+aiohttp>=3.8.0           # Async HTTP client
+
+# Optional packages for enhanced features (graceful fallback if missing)
+# Text-to-Speech
+pyttsx3>=2.90            # Text-to-speech engine
+gTTS>=2.2.0              # Google Text-to-Speech (alternative)
+
+# Speech Recognition
+SpeechRecognition>=3.8.0  # Speech recognition library
+pyaudio>=0.2.11          # Audio I/O (for speech)
+
+# Natural Language Processing (optional)
+nltk>=3.6                # Natural language toolkit
+fuzzywuzzy>=0.18.0       # Fuzzy string matching
+python-Levenshtein>=0.12.0  # Fast string matching
+
+# Machine Learning (optional)
+sentence-transformers>=2.0.0  # Semantic similarity
+torch>=1.9.0             # PyTorch for ML
+numpy>=1.21.0            # Numerical computing
+
+# Web scraping (for enhanced internet search)
+beautifulsoup4>=4.9.0    # HTML parsing
+lxml>=4.6.0              # XML parser
+
+# PDF processing (for document analysis)
+PyPDF2>=2.10.0           # PDF reader
+python-docx>=0.8.11      # Word document processing
+
+# System monitoring enhancements
+py-cpuinfo>=8.0.0        # CPU information
+distro>=1.6.0            # Linux distribution info
+
+# Database enhancements
+sqlalchemy>=1.4.0        # ORM for complex queries (optional)
+
+# Encryption and security
+cryptography>=3.4.0      # Cryptographic functions
+hashlib                  # Built-in hashing
+
+# Configuration and serialization
+pyyaml>=5.4.0            # YAML configuration support
+toml>=0.10.0             # TOML configuration support
+
+# Logging enhancements
+colorlog>=6.6.0          # Colored logging output
+loguru>=0.5.0            # Enhanced logging (alternative)
+
+# Development and testing
+pytest>=6.2.0           # Testing framework
+pytest-asyncio>=0.15.0  # Async testing
+black>=21.0.0            # Code formatting
+flake8>=3.9.0            # Code linting
+
+# Performance monitoring
+memory-profiler>=0.60.0  # Memory usage profiling
+line-profiler>=3.3.0    # Line-by-line profiling
+
+# Optional GUI support (for future web interface)
+flask>=2.0.0             # Web framework
+fastapi>=0.68.0          # Modern API framework
+uvicorn>=0.15.0          # ASGI server
+
+# Network utilities
+netifaces>=0.11.0        # Network interface info
+scapy>=2.4.5             # Network packet manipulation
+
+# File system utilities
+watchdog>=2.1.0          # File system event monitoring
+send2trash>=1.8.0        # Safe file deletion
+
+# Performance
+cachetools>=4.2.0        # Caching utilities
+joblib>=1.0.0            # Parallel processing
+
+# Note: Many dependencies are optional and Whispherblade will gracefully
+# degrade functionality if they're not available. Core functionality only
+# requires: requests, psutil, aiohttp, and standard library modules.
