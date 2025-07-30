@@ -12,3 +12,27 @@
 2025-07-17 20:36:17,217 - __main__ - INFO - All components initialized successfully
 2025-07-17 20:36:19,699 - root - ERROR - DuckDuckGo search error: 200, message='Attempt to decode JSON with unexpected mimetype: application/x-javascript', url='https://api.duckduckgo.com/?q=error+code+0x800F0922&format=json&no_html=1&skip_disambig=1'
 2025-07-17 20:36:25,317 - root - INFO - Web search successful using _search_fallback_scraping
+2025-07-22 09:32:35,272 - __main__ - INFO - Initializing WhisperBlade Ultimate Enhanced...
+2025-07-22 09:32:35,278 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-07-22 09:32:35,278 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-22 09:32:42,410 - comtypes.client._code_cache - INFO - Imported existing <module 'comtypes.gen' from 'C:\\Users\\Ayush\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\comtypes\\gen\\__init__.py'>
+2025-07-22 09:32:42,411 - comtypes.client._code_cache - INFO - Using writeable comtypes cache directory: 'C:\Users\Ayush\AppData\Local\Programs\Python\Python313\Lib\site-packages\comtypes\gen'
+2025-07-22 09:32:42,954 - __main__ - INFO - All components initialized successfully
+2025-07-22 09:32:45,353 - root - ERROR - DuckDuckGo search error: 200, message='Attempt to decode JSON with unexpected mimetype: application/x-javascript', url='https://api.duckduckgo.com/?q=error+code+0x800F0922&format=json&no_html=1&skip_disambig=1'
+2025-07-22 09:32:49,892 - root - INFO - Web search successful using _search_fallback_scraping
+2025-07-22 09:33:03,189 - __main__ - INFO - Initializing WhisperBlade Ultimate Enhanced...
+2025-07-22 09:33:03,194 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-07-22 09:33:03,194 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-22 09:33:08,630 - comtypes.client._code_cache - INFO - Imported existing <module 'comtypes.gen' from 'C:\\Users\\Ayush\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\comtypes\\gen\\__init__.py'>
+2025-07-22 09:33:08,631 - comtypes.client._code_cache - INFO - Using writeable comtypes cache directory: 'C:\Users\Ayush\AppData\Local\Programs\Python\Python313\Lib\site-packages\comtypes\gen'
+2025-07-22 09:33:08,810 - __main__ - INFO - All components initialized successfully
+2025-07-22 09:33:11,194 - root - ERROR - DuckDuckGo search error: 200, message='Attempt to decode JSON with unexpected mimetype: application/x-javascript', url='https://api.duckduckgo.com/?q=error+code+0x800F0922&format=json&no_html=1&skip_disambig=1'
+2025-07-22 09:33:14,576 - root - INFO - Web search successful using _search_fallback_scraping
+2025-07-30 21:28:50,710 - __main__ - INFO - Initializing WhisperBlade Ultimate Enhanced...
+2025-07-30 21:28:50,719 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-07-30 21:28:50,720 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-07-30 21:28:57,647 - comtypes.client._code_cache - INFO - Imported existing <module 'comtypes.gen' from 'C:\\Users\\Ayush\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\comtypes\\gen\\__init__.py'>
+2025-07-30 21:28:57,647 - comtypes.client._code_cache - INFO - Using writeable comtypes cache directory: 'C:\Users\Ayush\AppData\Local\Programs\Python\Python313\Lib\site-packages\comtypes\gen'
+2025-07-30 21:28:58,193 - __main__ - INFO - All components initialized successfully
+2025-07-30 21:29:00,607 - root - ERROR - DuckDuckGo search error: 200, message='Attempt to decode JSON with unexpected mimetype: application/x-javascript', url='https://api.duckduckgo.com/?q=error+code+0x800F0922&format=json&no_html=1&skip_disambig=1'
+2025-07-30 21:29:06,394 - root - INFO - Web search successful using _search_fallback_scraping
