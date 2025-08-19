@@ -6,7 +6,7 @@
   Check with:
 python --version
 
-
+h
 - Microphone and speakers connected
 
 ---
