@@ -36,3 +36,13 @@
 2025-07-30 21:28:58,193 - __main__ - INFO - All components initialized successfully
 2025-07-30 21:29:00,607 - root - ERROR - DuckDuckGo search error: 200, message='Attempt to decode JSON with unexpected mimetype: application/x-javascript', url='https://api.duckduckgo.com/?q=error+code+0x800F0922&format=json&no_html=1&skip_disambig=1'
 2025-07-30 21:29:06,394 - root - INFO - Web search successful using _search_fallback_scraping
+2025-08-21 09:05:00,721 - __main__ - INFO - Initializing WhisperBlade Ultimate Enhanced...
+2025-08-21 09:05:00,727 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-08-21 09:05:00,727 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-08-21 09:05:02,655 - root - ERROR - Failed to initialize semantic model: (MaxRetryError('HTTPSConnectionPool(host=\'huggingface.co\', port=443): Max retries exceeded with url: /api/models/sentence-transformers/all-MiniLM-L6-v2/tree/main/additional_chat_templates?recursive=False&expand=False (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x000001DCDF8E6E90>: Failed to resolve \'huggingface.co\' ([Errno 11001] getaddrinfo failed)"))'), '(Request ID: c41c1f03-337c-4656-ac2d-db50188bd32b)')
+2025-08-21 09:05:02,719 - comtypes.client._code_cache - INFO - Imported existing <module 'comtypes.gen' from 'C:\\Users\\Ayush\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\site-packages\\comtypes\\gen\\__init__.py'>
+2025-08-21 09:05:02,720 - comtypes.client._code_cache - INFO - Using writeable comtypes cache directory: 'C:\Users\Ayush\AppData\Local\Programs\Python\Python313\Lib\site-packages\comtypes\gen'
+2025-08-21 09:05:02,866 - __main__ - INFO - All components initialized successfully
+2025-08-21 09:05:04,978 - root - ERROR - DuckDuckGo search error: Cannot connect to host api.duckduckgo.com:443 ssl:default [getaddrinfo failed]
+2025-08-21 09:05:04,980 - root - ERROR - Wikipedia search error: Cannot connect to host en.wikipedia.org:443 ssl:default [getaddrinfo failed]
+2025-08-21 09:05:04,981 - root - ERROR - Stack Overflow search error: Cannot connect to host api.stackexchange.com:443 ssl:default [getaddrinfo failed]
