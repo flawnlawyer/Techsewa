@@ -16,19 +16,19 @@ h ggg
 1. Open **Command Prompt** (Press `Win + R`, type `cmd`, hit Enter)
 
 2. Run the following commands one by one:
-pip install tkinter  # Usually comes with Python
-pip install pillow  # PIL for image handling
-pip install pyttsx3  # Text-to-speech engine
-pip install requests  # HTTP requests for web search
-pip install psutil  # System monitoring
-pip install matplotlib  # Charts and graphs
-pip install sv-ttk  # Modern theme for Tkinter
-pip install ping3  # Network ping utility
-pip install fuzzywuzzy  # Fuzzy string matching pip install gTTS  # Google Text-to-Speech (for Nepali TTS)
-pip install playsound  # Audio playback
-pip install python-Levenshtein  # Improves fuzzywuzzy performance
-pip install pyinstaller  # For creating executables
-pip install autopep8  # Code formatting
+pip install tkinter  
+pip install pillow  
+pip install pyttsx3  
+pip install requests  
+pip install psutil
+pip install matplotlib  
+pip install sv-ttk  
+pip install ping3 
+pip install fuzzywuzzy  
+pip install playsound  
+pip install python-Levenshtein  
+pip install pyinstaller  
+pip install autopep8  
 pip install pillow pyttsx3 requests psutil matplotlib sv-ttk ping3 fuzzywuzzy gTTS playsound python-Levenshtein
 ---
 

@@ -1,10 +1,3 @@
-
-#!/usr/bin/env python3
-"""
-WhisperBlade Ultimate Enhanced - Advanced AI Support System for TechSewa
-Version 2.0 - Improved architecture, performance, and features
-"""
-
 import os
 import json
 import re
