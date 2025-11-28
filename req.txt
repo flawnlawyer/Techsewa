@@ -1,0 +1,8 @@
+gtts==2.5.1
+pygame==2.5.2  # Alternative to playsound
+aiohttp==3.9.1
+sentence-transformers==2.2.2
+SpeechRecognition==3.10.0
+PyPDF2==3.0.1
+python-docx==1.1.0
+beautifulsoup4==4.12.2

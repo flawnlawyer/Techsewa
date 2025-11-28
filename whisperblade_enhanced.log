@@ -46,3 +46,10 @@
 2025-08-21 09:05:04,978 - root - ERROR - DuckDuckGo search error: Cannot connect to host api.duckduckgo.com:443 ssl:default [getaddrinfo failed]
 2025-08-21 09:05:04,980 - root - ERROR - Wikipedia search error: Cannot connect to host en.wikipedia.org:443 ssl:default [getaddrinfo failed]
 2025-08-21 09:05:04,981 - root - ERROR - Stack Overflow search error: Cannot connect to host api.stackexchange.com:443 ssl:default [getaddrinfo failed]
+2025-11-11 08:58:09,301 - __main__ - INFO - Initializing WhisperBlade Ultimate Enhanced...
+2025-11-11 08:58:09,323 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-11-11 08:58:09,323 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-11-11 08:58:13,377 - huggingface_hub.file_download - WARNING - Xet Storage is enabled for this repo, but the 'hf_xet' package is not installed. Falling back to regular HTTP download. For better performance, install the package with: `pip install huggingface_hub[hf_xet]` or `pip install hf_xet`
+2025-11-11 08:59:07,575 - __main__ - INFO - All components initialized successfully
+2025-11-11 08:59:10,177 - root - ERROR - DuckDuckGo search error: 200, message='Attempt to decode JSON with unexpected mimetype: application/x-javascript', url='https://api.duckduckgo.com/?q=error+code+0x800F0922&format=json&no_html=1&skip_disambig=1'
+2025-11-11 08:59:16,231 - root - INFO - Web search successful using _search_fallback_scraping

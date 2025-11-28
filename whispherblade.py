@@ -32,12 +32,16 @@ except ImportError:
     SEMANTIC_OK = False
     print("⚠️  sentence_transformers not available - semantic search disabled")
 
+# Use dynamic imports to avoid static analyzer errors when the package is not installed
 try:
-    import speech_recognition as sr
-    import pyttsx3
+    import importlib
+    sr = importlib.import_module('speech_recognition')
+    pyttsx3 = importlib.import_module('pyttsx3')
     SPEECH_OK = True
-except ImportError:
+except Exception:
     SPEECH_OK = False
+    sr = None
+    pyttsx3 = None
     print("⚠️  speech libraries not available - voice interface disabled")
 
 try:
