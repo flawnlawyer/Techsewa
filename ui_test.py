@@ -1373,3 +1373,4 @@ if __name__ == "__main__":
             json.dump(default_db, f, indent=2, ensure_ascii=False)
     
     app = TechsewaProApp()
+     app.mainloop()
