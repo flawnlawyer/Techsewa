@@ -23,6 +23,7 @@ import matplotlib
 matplotlib.use("Agg")
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
+from whispherblade import EnhancedWebSearchPlugin
 
 # Optional imports for enhanced features
 try:
