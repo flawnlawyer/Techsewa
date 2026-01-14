@@ -1,4 +1,4 @@
-# Techsewa - Setup Guide (Command Prompt)
+.# Techsewa - Setup Guide (Command Prompt)
 
 ## Requirements
 
@@ -10,6 +10,7 @@ h ggg
 - Microphone and speakers connected
 
 ---
+--
 
 ## How to Install Required Python Packages
 
