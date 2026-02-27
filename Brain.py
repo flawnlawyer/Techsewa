@@ -13,7 +13,7 @@ from typing import Dict, List, Optional
 DEFAULT_PROBLEMS = [
     {
         "id": "restart-windows",
-        "aliases": ["how to restart windows", "reboot pc", "restart computer"],
+        "aliases": ["how to restart windows", "reboot pc", "restart computer", restart],
         "np_aliases": ["windows restart गर्ने तरिका", "कम्प्युटर रिस्टार्ट गर्ने तरिका"],
         "en": "Press Win + X, then select 'Shut down or sign out' > 'Restart'",
         "np": "Win + X थिच्नुहोस्, त्यसपछि 'Shut down or sign out' > 'Restart' चयन गर्नुहोस्",
